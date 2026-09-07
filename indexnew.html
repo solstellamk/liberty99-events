@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Liberty99 Staff Hub</title>
+<style>
+:root{--bg:#0b0a0d;--panel:#141116;--panel2:#1b151c;--line:#352737;--pink:#ff4fa3;--pink2:#ff8ac2;--text:#fff7fb;--muted:#bdaebb;--good:#79d99b;--bad:#ff8d9e;--warn:#ffd66b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}.wrap{width:min(1180px,calc(100% - 28px));margin:auto}
+header{padding:24px 0 14px}.headerRow{display:flex;justify-content:space-between;align-items:center;gap:14px}.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--pink),#9d2c72);display:grid;place-items:center;font-weight:900}
+h1{font-size:22px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:2px}
+button{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:10px 13px;cursor:pointer}button:hover{border-color:#70415b}button:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:var(--pink);border-color:var(--pink);color:#18040d;font-weight:800}.danger{color:var(--bad)}.good{color:var(--good)}
+.auth{display:flex;align-items:center;gap:8px}.userPill{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 11px;font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:8px;margin:8px 0 16px}.tab.active{background:#422035;border-color:#8c3b66}
+.toolbar{display:grid;grid-template-columns:minmax(240px,1fr) auto auto auto auto;gap:9px;margin:12px 0}
+input,select,textarea{width:100%;background:#100d11;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 12px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--pink)}
+.filters{display:flex;gap:7px;overflow:auto;padding:3px 0 11px;scrollbar-width:thin}.filter{white-space:nowrap;padding:7px 10px;font-size:13px}.filter.active{background:#422035;border-color:#8c3b66}
+.meta,.note{color:var(--muted);font-size:12px}.meta{margin:3px 0 12px}.status{display:none;margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);background:var(--panel);border-radius:10px}.status.show{display:block}.status.error{border-color:#753541;color:#ffb1bd}
+.recent{display:none;background:var(--panel);border:1px solid var(--line);padding:10px;border-radius:12px;margin-bottom:12px}.recent b{font-size:12px;color:var(--muted);margin-right:8px}.chip{padding:5px 8px;font-size:12px;margin:2px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;padding-bottom:40px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.head{display:flex;gap:10px;align-items:flex-start}.ico{font-size:22px}.title{min-width:0;flex:1}.title strong{display:block;font-size:15px}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.tag{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:999px}.tag.pending{color:var(--warn)}
+.fav{padding:4px 7px;background:transparent;color:#75616d}.fav.on{color:#ffd66b}.announcement{margin:13px 0;background:#0f0c10;border-radius:9px;padding:10px;min-height:61px;word-break:break-word}.actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.actions button{font-size:12px;padding:7px 9px}.count{margin-left:auto;color:var(--muted);font-size:11px}
+.details{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;color:#ddd}.details b{color:var(--pink2)}
+.empty{display:none;text-align:center;color:var(--muted);padding:45px}.overlay{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:20}.overlay.show{display:flex}.modal{width:min(760px,100%);max-height:88vh;overflow:auto;background:#100d11;border:1px solid var(--line);border-radius:16px;padding:17px}.modal.wide{width:min(980px,100%)}
+.modalTop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.modal h2{font-size:18px;margin:0}.close{padding:6px 10px}.form{display:grid;gap:10px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin:0 0 5px}.formActions{display:flex;justify-content:flex-end;gap:8px}
+.locSearch{margin-bottom:10px}.locList,.queue{display:grid;gap:8px}.loc,.queueItem{background:var(--panel);border:1px solid var(--line);padding:11px;border-radius:11px}.loc{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.coords{color:var(--muted);font-size:12px;margin-top:3px;word-break:break-all}
+.queueTop{display:flex;justify-content:space-between;gap:10px}.queueActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.builder{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.preview{background:#0f0c10;border-radius:9px;padding:10px;margin:9px 0;word-break:break-word}
+.queueSection{display:grid;gap:8px;margin-top:16px}.queueSection:first-child{margin-top:0}.queueSectionHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 2px}.queueSectionHead h3{margin:0;font-size:15px}.queueCount{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 8px}.queueItem{padding:13px}.queueTop{align-items:flex-start}.queueStatus{font-size:10px;color:var(--warn);border:1px solid #6f5b2a;background:#211b0d;border-radius:7px;padding:4px 7px;font-weight:800;letter-spacing:.04em}.queuePreview{margin:10px 0;background:#0f0c10;border:1px solid #2c202c;border-radius:9px;padding:10px}.queueMeta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}.queueMeta span{font-size:11px;color:var(--muted)}.queueEmpty{color:var(--muted);padding:12px;border:1px dashed var(--line);border-radius:10px}
+.locTopActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.locationNote{color:var(--muted);font-size:12px;margin-top:5px}.detailsGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.detailBox{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px}.detailBox.full{grid-column:1/-1}.detailLabel{font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}.detailValue{white-space:pre-wrap;word-break:break-word}.detailF3{font-size:14px;line-height:1.45}.modalActions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+
+.hidden{display:none!important}
+
+/* Parties toolkit layout */
+.partiesHero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:4px 0 16px;padding:18px;background:linear-gradient(135deg,#180d13,#2a1020);border:1px solid #6a2d49;border-radius:16px;box-shadow:0 0 32px #c52a7812}.partiesHero h2{margin:0 0 5px;font-size:21px;color:#fff8fb}.partiesHero p{margin:0;color:#c5a6b6;max-width:690px}.partiesHeroActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.partyToolbar{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:9px;margin:12px 0}.partyLayout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:14px;align-items:start}.partyLibrary{min-width:0}.partyGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-bottom:36px}.partyCard{background:#171015;border:1px solid #4a2435;border-radius:14px;padding:13px;min-width:0}.partyCard.selected{border-color:var(--pink);box-shadow:0 0 0 1px #ff4fa340,0 8px 30px #0003}.partyCard .announcement{min-height:82px;background:#100a0d;border:1px solid #3a1b29;margin:12px 0}.partyCard .actions button{flex:1}.partyCard .count{margin-left:0}.partyBuilder{position:sticky;top:12px;background:#171015;border:1px solid #6a2d49;border-radius:16px;padding:15px;box-shadow:0 12px 36px #0004}.builderTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}.builderTop h2{font-size:18px;margin:0;color:#fff8fb}.builderFields{display:grid;gap:9px}.builderPreview{margin-top:13px}.builderPreview label{display:flex;justify-content:space-between;color:#c5a6b6;font-size:12px;margin-bottom:5px}.previewBox{background:#10090d;border:1px solid #4a2435;border-radius:10px;padding:12px;min-height:76px;word-break:break-word}.previewCount{color:var(--pink2)}.previewCount.over{color:var(--bad);font-weight:800}.builderActions{display:flex;gap:8px;margin-top:10px}.builderActions button{flex:1}.builderAdmin{display:flex;justify-content:flex-end;margin-top:8px}.builderAdmin button{font-size:11px;padding:6px 9px}.helper{font-size:11px;color:#a88495;margin-top:6px}.partyMeta{color:#a88495;font-size:12px;margin:3px 0 10px}.partyEmpty{display:none;text-align:center;color:#a88495;padding:35px}.templateBadge{font-size:10px;color:#c5a6b6;border:1px solid #4a2435;padding:2px 6px;border-radius:999px}
+@media(max-width:900px){.partyLayout{grid-template-columns:1fr}.partyBuilder{position:static}.partyGrid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}.headerRow{align-items:flex-start;flex-direction:column}}
+@media(max-width:600px){.detailsGrid{grid-template-columns:1fr}.detailBox.full{grid-column:auto}.partiesHero{align-items:flex-start;flex-direction:column}.partiesHeroActions{width:100%;justify-content:flex-start}.partyToolbar{grid-template-columns:1fr}.partyGrid{grid-template-columns:1fr}.wrap{width:min(100% - 18px,1180px)}header{padding-top:18px}.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr 1fr}.toolbar button{padding:9px 7px;font-size:12px}.row2{grid-template-columns:1fr}.loc{grid-template-columns:1fr}.modal{padding:13px}.tabs{overflow:auto}.auth{width:100%;flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="headerRow">
+  <div class="brand"><div class="logo">L99</div><div><h1>Liberty99 Staff Hub</h1><div class="sub">Events & Parties — find it, customize it, copy it.</div></div></div>
+  <div class="auth"><span id="userPill" class="userPill">Public</span><button id="loginBtn">Login with Discord</button><button id="logoutBtn" class="hidden">Logout</button></div>
+</div></div></header>
+
+<main class="wrap">
+  <div class="tabs"><button class="tab active" data-tab="events">Events</button><button class="tab" data-tab="parties">Parties</button><button id="queueBtn" class="tab hidden">Approval Queue</button></div>
+  <div id="status" class="status"></div>
+
+  <section id="eventsView">
+    <div class="toolbar">
+      <input id="q" placeholder="Search events…" autocomplete="off">
+      <button id="randomBtn">🎲 Random</button><button id="favBtn">★ Favorites</button><button id="locationsBtn">📍 Locations</button>
+      <button id="addBtn" class="primary hidden">＋ Submit Event</button>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="meta"><span id="shown"></span> of <span id="total"></span> events</div>
+    <div class="recent" id="recent"><b>Recently Used</b><span id="recentItems"></span></div>
+    <section class="grid" id="grid"></section><div class="empty" id="empty">No matching events.</div>
+  </section>
+
+  <section id="partiesView" class="hidden">
+    <div class="partiesHero">
+      <div><h2>🎉 Parties F3 Toolkit</h2><p>Pick a reusable announcement template, customize the gang / organization and details, then copy the finished F3.</p></div>
+      <div class="partiesHeroActions"><button id="partySubmitBtn" class="primary hidden">＋ Submit Template</button></div>
+    </div>
+    <div class="partyToolbar">
+      <input id="partyQ" placeholder="Search party templates…" autocomplete="off">
+      <button id="partyReset">↻ Reset Builder</button>
+    </div>
+    <div class="filters" id="partyFilters"></div>
+    <div class="partyLayout">
+      <div class="partyLibrary">
+        <div class="partyMeta"><span id="partyShown"></span> of <span id="partyTotal"></span> templates available</div>
+        <section class="partyGrid" id="partyGrid"></section>
+        <div class="partyEmpty" id="partyEmpty">No matching party templates.</div>
+      </div>
+      <aside class="partyBuilder">
+        <div class="builderTop"><div><h2 id="builderTitle">Select a template</h2><div class="note" id="builderCategory">Choose one from the library.</div></div><span class="tag">LIVE PREVIEW</span></div>
+        <div class="builderFields">
+          <div class="field"><label>Name / gang / organization</label><input id="partyName" maxlength="24" placeholder="e.g. VAGOS"></div>
+          <div class="field"><label>Main detail</label><input id="partyDetail" maxlength="28" placeholder="e.g. CHOP SHOP"></div>
+          <div class="field"><label>Extra detail</label><input id="partyExtra" maxlength="28" placeholder="e.g. BEGINNERS WELCOME"></div>
+        </div>
+        <div class="builderPreview">
+          <label><span>F3 preview</span><span id="partyCount" class="previewCount">0/80</span></label>
+          <div id="partyPreview" class="previewBox">Select a template to start.</div>
+          <div class="helper">Keep it at 80 characters or less for F3.</div>
+        </div>
+        <div class="builderActions"><button id="copyPartyF3" class="primary" disabled>Copy F3</button><button id="clearPartyFields">Clear Fields</button></div>
+        <div id="partyBuilderAdmin" class="builderAdmin hidden"><button id="editSelectedParty">Edit Template</button><button id="disableSelectedParty" class="danger">Disable Template</button></div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="locationsOverlay"><div class="modal">
+  <div class="modalTop">
+    <div><h2>📍 Liberty99 Locations <span class="queueCount" id="locationCount">0 locations</span></h2><div class="note">Approved shared locations from the staff database.</div></div>
+    <div class="locTopActions"><button id="suggestLocationBtn" class="primary hidden">＋ Suggest Location</button><button class="close" data-close>✕</button></div>
+  </div>
+  <input class="locSearch" id="locQ" placeholder="Search locations…" autocomplete="off"><div class="locList" id="locList"></div>
+</div></div>
+
+<div class="overlay" id="locationSubmitOverlay"><div class="modal">
+  <div class="modalTop"><div><h2 id="locationFormTitle">＋ Suggest Location</h2><div class="note">New locations go to the shared approval queue before staff can use them.</div></div><button class="close" data-close>✕</button></div>
+  <form class="form" id="locationForm">
+    <input type="hidden" id="locationEditId"><input type="hidden" id="locationEditStatus">
+    <div class="field"><label>Location name</label><input id="locName" maxlength="100" required placeholder="e.g. Airport Hangar"></div>
+    <div class="field"><label>Coordinates <span>3 or 4 comma-separated numbers</span></label><input id="locCoords" maxlength="120" required placeholder="-2019.89, 3188.45, 39.96, 1.90"></div>
+    <div class="field"><label>Description <span>(optional)</span></label><textarea id="locDescription" rows="3" maxlength="1000"></textarea></div>
+    <div class="field"><label>Notes <span>(optional)</span></label><textarea id="locNotes" rows="3" maxlength="1500"></textarea></div>
+    <div class="formActions"><button type="button" data-close>Cancel</button><button class="primary" type="submit" id="locationSaveBtn">Submit for Approval</button></div>
+  </form>
+</div></div>
+
+<div class="overlay" id="eventDetailsOverlay"><div class="modal">
+  <div class="modalTop"><div><h2 id="detailsTitle">Event Details</h2><div class="note" id="detailsMeta"></div></div><button class="close" data-close>✕</button></div>
+  <div class="detailsGrid">
+    <div class="detailBox full"><div class="detailLabel">F3 Announcement</div><div class="detailValue detailF3" id="detailsF3"></div></div>
+    <div class="detailBox"><div class="detailLabel">Location</div><div class="detailValue" id="detailsLocation"></div></div>
+    <div class="detailBox"><div class="detailLabel">Setup</div><div class="detailValue" id="detailsSetup"></div></div>
+    <div class="detailBox full"><div class="detailLabel">How to run</div><div class="detailValue" id="detailsHow"></div></div>
+    <div class="detailBox full"><div class="detailLabel">Notes</div><div class="detailValue" id="detailsNotes"></div></div>
+  </div>
+  <div class="modalActions"><button id="detailsCopyName">Copy Name</button><button id="detailsCopyF3" class="primary">Copy Announcement</button></div>
+</div></div>
+
+<div class="overlay" id="eventOverlay"><div class="modal">
+  <div class="modalTop"><div><h2 id="eventFormTitle">＋ Submit Event</h2><div class="note">Submissions go to the shared approval queue.</div></div><button class="close" data-close>✕</button></div>
+  <form class="form" id="eventForm">
+    <input type="hidden" id="eventEditId"><input type="hidden" id="eventEditStatus">
+    <div class="row2"><div class="field"><label>Event name</label><input id="evName" maxlength="80" required></div><div class="field"><label>Category</label><input id="evCategory" maxlength="40" required></div></div>
+    <div class="field"><label><span>F3 announcement</span><span id="f3Count">0/80</span></label><textarea id="evF3" rows="3" maxlength="80" required></textarea></div>
+    <div class="row2"><div class="field"><label>Location <span>(optional)</span></label><select id="evLocation"><option value="">No location selected</option></select></div><div class="field"><label>Setup <span>(optional)</span></label><select id="evSetup"><option>Easy</option><option>Needs Setup</option><option>Needs Vehicles</option></select></div></div>
+    <div class="field"><label>How to run <span>(optional)</span></label><textarea id="evHow" rows="4" maxlength="3000"></textarea></div>
+    <div class="formActions"><button type="button" data-close>Cancel</button><button class="primary" type="submit" id="eventSaveBtn">Submit for Approval</button></div>
+  </form>
+</div></div>
+
+<div class="overlay" id="partySubmitOverlay"><div class="modal">
+  <div class="modalTop"><div><h2 id="partyFormTitle">＋ Submit Party Template</h2><div class="note">Use {name}, {detail} and {extra}. All three are required.</div></div><button class="close" data-close>✕</button></div>
+  <form class="form" id="partyForm">
+    <input type="hidden" id="partyEditId"><input type="hidden" id="partyEditStatus">
+    <div class="row2"><div class="field"><label>Template name</label><input id="ptName" maxlength="80" required></div><div class="field"><label>Category</label><input id="ptCategory" maxlength="40" required></div></div>
+    <div class="field"><label>Template</label><textarea id="ptTemplate" maxlength="300" rows="3" required placeholder="🎉 {name} PARTY 🎉 {detail} • {extra}"></textarea></div>
+    <div class="row2"><div class="field"><label>Icon <span>(optional)</span></label><input id="ptIcon" maxlength="32" placeholder="🎉"></div><div class="field"><label>Description <span>(optional)</span></label><input id="ptDescription" maxlength="1000"></div></div>
+    <div class="field"><label>Default name</label><input id="ptDefaultName" maxlength="24" required></div>
+    <div class="field"><label>Default detail</label><input id="ptDefaultDetail" maxlength="28" required></div>
+    <div class="field"><label>Default extra</label><input id="ptDefaultExtra" maxlength="28" required></div>
+    <div class="preview" id="ptPreview">Preview</div>
+    <div class="formActions"><button type="button" data-close>Cancel</button><button class="primary" type="submit" id="partySaveBtn">Submit for Approval</button></div>
+  </form>
+</div></div>
+
+<div class="overlay" id="queueOverlay"><div class="modal wide">
+  <div class="modalTop"><div><h2>Approval Queue</h2><div class="note">Only queues you have permission to moderate are shown.</div></div><button class="close" data-close>✕</button></div>
+  <div id="queueContent" class="queue"></div>
+</div></div>
+
+<script>
+const API="https://worker.dawud-jannah.workers.dev";
+const $=id=>document.getElementById(id);
+const read=(k,d=[])=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}};
+const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+async function copy(v,b){try{await navigator.clipboard.writeText(v)}catch{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}if(b){const o=b.textContent;b.textContent='✓ Copied';setTimeout(()=>b.textContent=o,800)}}
+function showStatus(msg,error=false){const x=$('status');x.textContent=msg;x.className='status show'+(error?' error':'');setTimeout(()=>{if(x.textContent===msg)x.className='status'},5000)}
+async function api(path,options={}){const r=await fetch(API+path,{credentials:'include',...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(options.headers||{})}});let data={};try{data=await r.json()}catch{}if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);return data}
+function openOverlay(id){$(id).classList.add('show')}function closeOverlays(){document.querySelectorAll('.overlay').forEach(x=>x.classList.remove('show'))}
+
+let member=null,events=[],parties=[],locations=[],favs=new Set(read('l99Favs',[])),recent=read('l99Recent',[]).slice(0,8),active='All',favOnly=false,partyActive='All',selectedPartyId=null,detailsEventId=null;
+
+function setupTag(e){if(e.setup)return e.setup;const c=(e.category||'').toLowerCase(),n=(e.name||'').toLowerCase();if(['airport sprint','beach run'].includes(n))return'Easy';if(c.includes('vehicle')||c.includes('race'))return'Needs Vehicles';if(c.includes('social')||c.includes('trivia')||c.includes('party')||c.includes('luck')||c.includes('search'))return'Easy';if(c.includes('melee')||c.includes('survival')||c.includes('hide'))return'Needs Setup';return'Easy'}
+function normalizeEvent(e){return {...e,text:e.announcement??e.text??'',how:e.instructions??e.how??''}}
+async function loadAuth(){try{const d=await api('/api/auth/me');member=d.member}catch{member=null}renderAuth()}
+function renderAuth(){
+ $('userPill').textContent=member?`${member.display_name} • ${member.department}`:'Public';
+ $('loginBtn').classList.toggle('hidden',!!member);$('logoutBtn').classList.toggle('hidden',!member);
+ $('addBtn').classList.toggle('hidden',!(member?.can_submit_events));
+ $('partySubmitBtn').classList.toggle('hidden',!(member?.can_submit_parties));
+ $('suggestLocationBtn')?.classList.toggle('hidden',!(member?.can_submit_events));
+ $('queueBtn').classList.toggle('hidden',!(member?.can_approve_events||member?.can_approve_parties));
+ $('partyBuilderAdmin')?.classList.toggle('hidden',!(member?.can_approve_parties&&selectedPartyId));
+}
+async function loadEvents(){try{const d=await api('/api/events');events=(d.events||[]).map(normalizeEvent);buildFilters();renderEvents()}catch(e){showStatus('Could not load Events: '+e.message,true);events=[];buildFilters();renderEvents()}}
+async function loadParties(){try{const d=await api('/api/parties');parties=d.templates||[];buildPartyFilters();renderParties()}catch(e){showStatus('Could not load Parties: '+e.message,true);parties=[];buildPartyFilters();renderParties()}}
+async function loadLocations(){try{const d=await api('/api/locations');locations=d.locations||[];populateEventLocations();renderLocations()}catch(e){showStatus('Could not load Locations: '+e.message,true);locations=[];populateEventLocations();renderLocations()}}
+
+function buildFilters(){const cats=['All',...new Set(events.map(e=>e.category))];if(!cats.includes(active))active='All';$('filters').innerHTML=cats.map(c=>`<button class="filter ${c===active?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');document.querySelectorAll('#filters [data-cat]').forEach(b=>b.onclick=()=>{active=b.dataset.cat;buildFilters();renderEvents()})}
+function markRecent(n){recent=[n,...recent.filter(x=>x!==n)].slice(0,8);write('l99Recent',recent);renderRecent()}
+function renderRecent(){const box=$('recent');box.style.display=recent.length?'block':'none';$('recentItems').innerHTML=recent.map(n=>`<button class="chip" data-recent="${esc(n)}">${esc(n)}</button>`).join('');document.querySelectorAll('[data-recent]').forEach(b=>b.onclick=()=>{$('q').value=b.dataset.recent;renderEvents()})}
+function renderEvents(){
+ const term=$('q').value.trim().toLowerCase();let list=events.filter(e=>(active==='All'||e.category===active)&&(!favOnly||favs.has(e.name))&&(!term||`${e.name} ${e.category} ${e.text} ${e.how||''} ${e.location||''}`.toLowerCase().includes(term)));
+ list.sort((a,b)=>(Number(favs.has(b.name))-Number(favs.has(a.name)))||a.name.localeCompare(b.name));
+ $('total').textContent=events.length;$('shown').textContent=list.length;$('empty').style.display=list.length?'none':'block';
+ $('grid').innerHTML=list.map(e=>`<article class="card"><div class="head"><span class="ico">${esc(e.icon||'🎉')}</span><div class="title"><strong>${esc(e.name)}</strong><div class="tags"><span class="tag">${esc(e.category)}</span><span class="tag">${esc(setupTag(e))}</span></div></div><button class="fav ${favs.has(e.name)?'on':''}" data-fav="${esc(e.name)}">★</button></div><div class="announcement">${esc(e.text)}</div><div class="actions"><button data-copy="${esc(e.name)}" data-text="${esc(e.text)}">Copy Announcement</button><button data-copyname="${esc(e.name)}">Copy Name</button><button data-details="${e.id}">Details</button>${member?.can_approve_events?`<button data-edit-event="${e.id}">Edit</button><button class="danger" data-disable-event="${e.id}">Disable</button>`:''}<span class="count">${[...e.text].length}/80</span></div></article>`).join('');
+ document.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{favs.has(b.dataset.fav)?favs.delete(b.dataset.fav):favs.add(b.dataset.fav);write('l99Favs',[...favs]);renderEvents()});
+ document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{markRecent(b.dataset.copy);copy(b.dataset.text,b)});document.querySelectorAll('[data-copyname]').forEach(b=>b.onclick=()=>copy(b.dataset.copyname,b));
+ document.querySelectorAll('[data-details]').forEach(b=>b.onclick=()=>openEventDetails(b.dataset.details));
+ document.querySelectorAll('[data-edit-event]').forEach(b=>b.onclick=()=>{const e=events.find(x=>String(x.id)===String(b.dataset.editEvent));if(e)openEventForm({...e,status:'approved'})});
+ document.querySelectorAll('[data-disable-event]').forEach(b=>b.onclick=async()=>{if(!confirm('Disable this approved Event?'))return;try{await api(`/api/admin/events/${b.dataset.disableEvent}/disable`,{method:'PATCH'});await loadEvents();showStatus('Event disabled.')}catch(e){showStatus(e.message,true)}});
+}
+
+function buildPartyFilters(){const cats=['All',...new Set(parties.map(p=>p.category))];if(!cats.includes(partyActive))partyActive='All';$('partyFilters').innerHTML=cats.map(c=>`<button class="filter ${c===partyActive?'active':''}" data-pcat="${esc(c)}">${esc(c)}</button>`).join('');document.querySelectorAll('[data-pcat]').forEach(b=>b.onclick=()=>{partyActive=b.dataset.pcat;buildPartyFilters();renderParties()})}
+function renderTemplate(t,n,d,e){return String(t||'').replaceAll('{name}',n||'').replaceAll('{detail}',d||'').replaceAll('{extra}',e||'')}
+function selectedParty(){return parties.find(p=>String(p.id)===String(selectedPartyId))||null}
+function selectParty(id,resetFields=true){const p=parties.find(x=>String(x.id)===String(id));if(!p)return;selectedPartyId=p.id;$('builderTitle').textContent=`${p.icon||'🎉'} ${p.name}`;$('builderCategory').textContent=p.category||'';if(resetFields){$('partyName').value=p.default_name||'';$('partyDetail').value=p.default_detail||'';$('partyExtra').value=p.default_extra||''}updatePartyBuilder();$('partyBuilderAdmin').classList.toggle('hidden',!(member?.can_approve_parties));renderParties()}
+function updatePartyBuilder(){const p=selectedParty();if(!p){$('partyPreview').textContent='Select a template to start.';$('partyCount').textContent='0/80';$('partyCount').classList.remove('over');$('copyPartyF3').disabled=true;return}const out=renderTemplate(p.template,$('partyName').value,$('partyDetail').value,$('partyExtra').value);const len=[...out].length;$('partyPreview').textContent=out;$('partyCount').textContent=len+'/80';$('partyCount').classList.toggle('over',len>80);$('copyPartyF3').disabled=!out||len>80}
+function renderParties(){
+ const term=$('partyQ').value.trim().toLowerCase();const list=parties.filter(p=>(partyActive==='All'||p.category===partyActive)&&(!term||`${p.name} ${p.category} ${p.template} ${p.description||''}`.toLowerCase().includes(term)));
+ $('partyTotal').textContent=parties.length;$('partyShown').textContent=list.length;$('partyEmpty').style.display=list.length?'none':'block';
+ if(parties.length && !selectedParty())selectedPartyId=parties[0].id;
+ if(selectedParty() && !$('partyName').value && !$('partyDetail').value && !$('partyExtra').value){const p=selectedParty();$('builderTitle').textContent=`${p.icon||'🎉'} ${p.name}`;$('builderCategory').textContent=p.category||'';$('partyName').value=p.default_name||'';$('partyDetail').value=p.default_detail||'';$('partyExtra').value=p.default_extra||'';updatePartyBuilder()}
+ $('partyGrid').innerHTML=list.map(p=>{const out=renderTemplate(p.template,p.default_name,p.default_detail,p.default_extra);return `<article class="partyCard ${String(p.id)===String(selectedPartyId)?'selected':''}"><div class="head"><span class="ico">${esc(p.icon||'🎉')}</span><div class="title"><strong>${esc(p.name)}</strong><div class="tags"><span class="tag">${esc(p.category)}</span><span class="templateBadge">TEMPLATE</span></div></div></div><div class="announcement">${esc(out)}</div><div class="actions"><button class="primary" data-puse="${p.id}">Use Template</button><span class="count">${[...out].length}/80</span></div></article>`}).join('');
+ document.querySelectorAll('[data-puse]').forEach(b=>b.onclick=()=>selectParty(b.dataset.puse,true));
+ updatePartyBuilder();
+}
+
+function populateEventLocations(selectedId=null){const current=selectedId??$('evLocation')?.value??'';if(!$('evLocation'))return;$('evLocation').innerHTML='<option value="">No location selected</option>'+locations.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');$('evLocation').value=current==null?'':String(current)}
+function renderLocations(){const t=$('locQ').value.trim().toLowerCase();const list=locations.filter(x=>`${x.name} ${x.coordinates||''} ${x.description||''} ${x.notes||''}`.toLowerCase().includes(t));if($('locationCount'))$('locationCount').textContent=`${locations.length} location${locations.length===1?'':'s'}`;$('locList').innerHTML=list.map(x=>`<div class="loc"><div><strong>${esc(x.name)}</strong><div class="coords">${esc(x.coordinates||'')}</div>${x.description?`<div class="locationNote">${esc(x.description)}</div>`:''}</div><div class="actions"><button data-coords="${esc(x.coordinates||'')}">Copy Coords</button>${member?.can_approve_events?`<button data-edit-location="${x.id}">Edit</button><button class="danger" data-disable-location="${x.id}">Disable</button>`:''}</div></div>`).join('')||'<div class="empty" style="display:block">No matching locations.</div>';document.querySelectorAll('[data-coords]').forEach(b=>b.onclick=()=>copy(b.dataset.coords,b));document.querySelectorAll('[data-edit-location]').forEach(b=>b.onclick=()=>{const x=locations.find(l=>String(l.id)===String(b.dataset.editLocation));if(x)openLocationForm({...x,status:'approved'})});document.querySelectorAll('[data-disable-location]').forEach(b=>b.onclick=async()=>{if(!confirm('Disable this approved Location? Existing Events keep their saved location name.'))return;try{await api(`/api/admin/locations/${b.dataset.disableLocation}/disable`,{method:'PATCH'});await loadLocations();showStatus('Location disabled.')}catch(e){showStatus(e.message,true)}})}
+function openLocationForm(item=null){$('locationEditId').value=item?.id||'';$('locationEditStatus').value=item?.status||'';$('locationFormTitle').textContent=item?(item.status==='approved'?'Edit Approved Location':'Edit Pending Location'):'＋ Suggest Location';$('locationSaveBtn').textContent=item?'Save Changes':'Submit for Approval';$('locName').value=item?.name||'';$('locCoords').value=item?.coordinates||'';$('locDescription').value=item?.description||'';$('locNotes').value=item?.notes||'';openOverlay('locationSubmitOverlay')}
+function openEventDetails(id){const e=events.find(x=>String(x.id)===String(id));if(!e)return;detailsEventId=e.id;$('detailsTitle').textContent=`${e.icon||'🎉'} ${e.name}`;$('detailsMeta').textContent=`${e.category||'Uncategorized'} • ${setupTag(e)}`;$('detailsF3').textContent=e.text||'—';$('detailsLocation').textContent=e.location||'No location assigned';$('detailsSetup').textContent=setupTag(e);$('detailsHow').textContent=e.how||'No instructions added yet.';$('detailsNotes').textContent=e.notes||'No notes added.';openOverlay('eventDetailsOverlay')}
+function updateEventCount(){$('f3Count').textContent=[...$('evF3').value].length+'/80'}
+function openEventForm(item=null){$('eventEditId').value=item?.id||'';$('eventEditStatus').value=item?.status||'';$('eventFormTitle').textContent=item?(item.status==='approved'?'Edit Approved Event':'Edit Pending Event'):'＋ Submit Event';$('eventSaveBtn').textContent=item?'Save Changes':'Submit for Approval';$('evName').value=item?.name||'';$('evCategory').value=item?.category||'';$('evF3').value=item?.announcement||'';populateEventLocations(item?.location_id??'');$('evSetup').value=item?.setup||'Easy';$('evHow').value=item?.instructions||'';updateEventCount();openOverlay('eventOverlay')}
+function updatePartyFormPreview(){const out=renderTemplate($('ptTemplate').value,$('ptDefaultName').value,$('ptDefaultDetail').value,$('ptDefaultExtra').value);$('ptPreview').textContent=out+`  (${[...out].length}/80)`}
+function openPartyForm(item=null){$('partyEditId').value=item?.id||'';$('partyEditStatus').value=item?.status||'';$('partyFormTitle').textContent=item?(item.status==='approved'?'Edit Approved Party Template':'Edit Pending Party Template'):'＋ Submit Party Template';$('partySaveBtn').textContent=item?'Save Changes':'Submit for Approval';$('ptName').value=item?.name||'';$('ptCategory').value=item?.category||'';$('ptTemplate').value=item?.template||'';$('ptDescription').value=item?.description||'';$('ptIcon').value=item?.icon||'';$('ptDefaultName').value=item?.default_name||'';$('ptDefaultDetail').value=item?.default_detail||'';$('ptDefaultExtra').value=item?.default_extra||'';updatePartyFormPreview();openOverlay('partySubmitOverlay')}
+
+$('partyName').oninput=updatePartyBuilder;$('partyDetail').oninput=updatePartyBuilder;$('partyExtra').oninput=updatePartyBuilder;
+$('copyPartyF3').onclick=()=>{const p=selectedParty();if(!p)return;const out=renderTemplate(p.template,$('partyName').value,$('partyDetail').value,$('partyExtra').value);copy(out,$('copyPartyF3'))};
+$('clearPartyFields').onclick=()=>{$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';updatePartyBuilder()};
+$('partyReset').onclick=()=>{const p=selectedParty();if(p)selectParty(p.id,true)};
+$('editSelectedParty').onclick=()=>{const p=selectedParty();if(p&&member?.can_approve_parties)openPartyForm({...p,status:'approved'})};
+$('disableSelectedParty').onclick=async()=>{const p=selectedParty();if(!p||!member?.can_approve_parties)return;if(!confirm(`Disable approved template "${p.name}"?`))return;try{await api(`/api/admin/parties/${p.id}/disable`,{method:'PATCH'});selectedPartyId=null;$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';await loadParties();showStatus('Parties template disabled.')}catch(e){showStatus(e.message,true)}};
+
+$('eventForm').onsubmit=async e=>{e.preventDefault();const id=$('eventEditId').value;const status=$('eventEditStatus').value;const body={name:$('evName').value.trim(),category:$('evCategory').value.trim(),announcement:$('evF3').value.trim(),location_id:$('evLocation').value?Number($('evLocation').value):null,setup:$('evSetup').value||null,instructions:$('evHow').value.trim()||null};try{await api(id?`/api/admin/events/${id}`:'/api/events/submit',{method:id?'PATCH':'POST',body:JSON.stringify(body)});closeOverlays();if(!id){showStatus('Event submitted for approval.')}else if(status==='approved'){await loadEvents();showStatus('Approved Event updated.')}else{showStatus('Pending Event updated.');await openQueue()}}catch(err){showStatus(err.message,true)}}
+$('partyForm').onsubmit=async e=>{e.preventDefault();const id=$('partyEditId').value;const status=$('partyEditStatus').value;const body={name:$('ptName').value.trim(),category:$('ptCategory').value.trim(),template:$('ptTemplate').value.trim(),description:$('ptDescription').value.trim()||null,icon:$('ptIcon').value.trim()||null,default_name:$('ptDefaultName').value.trim(),default_detail:$('ptDefaultDetail').value.trim(),default_extra:$('ptDefaultExtra').value.trim()};try{await api(id?`/api/admin/parties/${id}`:'/api/parties/submit',{method:id?'PATCH':'POST',body:JSON.stringify(body)});closeOverlays();if(!id){showStatus('Parties template submitted for approval.')}else if(status==='approved'){await loadParties();showStatus('Approved Parties template updated.')}else{showStatus('Pending Parties template updated.');await openQueue()}}catch(err){showStatus(err.message,true)}}
+$('locationForm').onsubmit=async e=>{e.preventDefault();const id=$('locationEditId').value;const status=$('locationEditStatus').value;const body={name:$('locName').value.trim(),coordinates:$('locCoords').value.trim(),description:$('locDescription').value.trim()||null,notes:$('locNotes').value.trim()||null};try{await api(id?`/api/admin/locations/${id}`:'/api/locations/submit',{method:id?'PATCH':'POST',body:JSON.stringify(body)});closeOverlays();if(!id){showStatus('Location submitted for approval.')}else if(status==='approved'){await loadLocations();showStatus('Approved Location updated.')}else{showStatus('Pending Location updated.');await openQueue()}}catch(err){showStatus(err.message,true)}}
+
+async function openQueue(){
+ const sections=[];
+ try{
+  if(member?.can_approve_events){
+   const d=await api('/api/admin/events/pending');
+   const items=(d.events||[]).map(e=>`<div class="queueItem"><div class="queueTop"><div><strong>${esc(e.name)}</strong><div class="queueMeta"><span>${esc(e.category)}</span><span>Submitted by ${esc(e.submitted_by_name||'Unknown')}</span>${e.location?`<span>📍 ${esc(e.location)}</span>`:''}</div></div><span class="queueStatus">PENDING</span></div><div class="queuePreview">${esc(e.announcement)}</div><div class="queueActions"><button data-qedit-event="${e.id}">Edit</button><button class="primary" data-qapprove-event="${e.id}">Approve</button><button class="danger" data-qreject-event="${e.id}">Reject</button></div></div>`).join('');
+   sections.push(`<section class="queueSection"><div class="queueSectionHead"><h3>Events</h3><span class="queueCount">${d.count} pending</span></div>${items||'<div class="queueEmpty">No pending Events.</div>'}</section>`);
+  }
+  if(member?.can_approve_parties){
+   const d=await api('/api/admin/parties/pending');
+   const items=(d.templates||[]).map(p=>`<div class="queueItem"><div class="queueTop"><div><strong>${esc(p.name)}</strong><div class="queueMeta"><span>${esc(p.category)}</span><span>Submitted by ${esc(p.submitted_by_name||'Unknown')}</span></div></div><span class="queueStatus">PENDING</span></div><div class="queuePreview">${esc(renderTemplate(p.template,p.default_name,p.default_detail,p.default_extra))}</div><div class="queueActions"><button data-qedit-party="${p.id}">Edit</button><button class="primary" data-qapprove-party="${p.id}">Approve</button><button class="danger" data-qreject-party="${p.id}">Reject</button></div></div>`).join('');
+   sections.push(`<section class="queueSection"><div class="queueSectionHead"><h3>Parties</h3><span class="queueCount">${d.count} pending</span></div>${items||'<div class="queueEmpty">No pending Party templates.</div>'}</section>`);
+  }
+  if(member?.can_approve_events){
+   const d=await api('/api/admin/locations/pending');
+   const items=(d.locations||[]).map(l=>`<div class="queueItem"><div class="queueTop"><div><strong>${esc(l.name)}</strong><div class="queueMeta"><span>Submitted by ${esc(l.submitted_by_name||'Unknown')}</span><span>📍 ${esc(l.coordinates)}</span></div></div><span class="queueStatus">PENDING</span></div>${l.description?`<div class="queuePreview">${esc(l.description)}</div>`:''}<div class="queueActions"><button data-qedit-location="${l.id}">Edit</button><button class="primary" data-qapprove-location="${l.id}">Approve</button><button class="danger" data-qreject-location="${l.id}">Reject</button></div></div>`).join('');
+   sections.push(`<section class="queueSection"><div class="queueSectionHead"><h3>Locations</h3><span class="queueCount">${d.count} pending</span></div>${items||'<div class="queueEmpty">No pending Locations.</div>'}</section>`);
+  }
+ }catch(e){showStatus(e.message,true);return}
+ $('queueContent').innerHTML=sections.join('')||'<div class="queueEmpty">Nothing pending.</div>';
+ openOverlay('queueOverlay');
+
+ document.querySelectorAll('[data-qapprove-event]').forEach(b=>b.onclick=()=>moderate('events',b.dataset.qapproveEvent,'approve'));
+ document.querySelectorAll('[data-qreject-event]').forEach(b=>b.onclick=()=>moderate('events',b.dataset.qrejectEvent,'reject'));
+ document.querySelectorAll('[data-qapprove-party]').forEach(b=>b.onclick=()=>moderate('parties',b.dataset.qapproveParty,'approve'));
+ document.querySelectorAll('[data-qreject-party]').forEach(b=>b.onclick=()=>moderate('parties',b.dataset.qrejectParty,'reject'));
+ document.querySelectorAll('[data-qapprove-location]').forEach(b=>b.onclick=()=>moderate('locations',b.dataset.qapproveLocation,'approve'));
+ document.querySelectorAll('[data-qreject-location]').forEach(b=>b.onclick=()=>moderate('locations',b.dataset.qrejectLocation,'reject'));
+
+ document.querySelectorAll('[data-qedit-event]').forEach(b=>b.onclick=async()=>{const d=await api('/api/admin/events/pending');const x=d.events.find(e=>String(e.id)===b.dataset.qeditEvent);if(x){closeOverlays();openEventForm({...x,status:'pending'})}});
+ document.querySelectorAll('[data-qedit-party]').forEach(b=>b.onclick=async()=>{const d=await api('/api/admin/parties/pending');const x=d.templates.find(p=>String(p.id)===b.dataset.qeditParty);if(x){closeOverlays();openPartyForm({...x,status:'pending'})}});
+ document.querySelectorAll('[data-qedit-location]').forEach(b=>b.onclick=async()=>{const d=await api('/api/admin/locations/pending');const x=d.locations.find(l=>String(l.id)===b.dataset.qeditLocation);if(x){closeOverlays();openLocationForm({...x,status:'pending'})}});
+}
+async function moderate(type,id,action){let body;if(action==='reject'){const reason=prompt('Optional rejection reason:','');if(reason===null)return;body=JSON.stringify({reason})}try{await api(`/api/admin/${type}/${id}/${action}`,{method:'PATCH',body});showStatus(action==='approve'?'Approved.':'Rejected.');await Promise.all([loadEvents(),loadParties(),loadLocations()]);await openQueue()}catch(e){showStatus(e.message,true)}}
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('eventsView').classList.toggle('hidden',b.dataset.tab!=='events');$('partiesView').classList.toggle('hidden',b.dataset.tab!=='parties')});
+$('loginBtn').onclick=()=>location.href=API+'/api/auth/discord';
+$('logoutBtn').onclick=async()=>{try{await api('/api/auth/logout',{method:'POST'});member=null;renderAuth();renderEvents();renderParties();showStatus('Logged out.')}catch(e){showStatus(e.message,true)}};
+$('queueBtn').onclick=openQueue;$('addBtn').onclick=()=>openEventForm();$('partySubmitBtn').onclick=()=>openPartyForm();$('suggestLocationBtn').onclick=()=>openLocationForm();
+$('q').oninput=renderEvents;$('partyQ').oninput=renderParties;$('locQ').oninput=renderLocations;$('evF3').oninput=updateEventCount;
+['ptTemplate','ptDefaultName','ptDefaultDetail','ptDefaultExtra'].forEach(id=>$(id).oninput=updatePartyFormPreview);
+$('randomBtn').onclick=()=>{let pool=events.filter(e=>(active==='All'||e.category===active)&&(!favOnly||favs.has(e.name)));const fresh=pool.filter(e=>!recent.includes(e.name));if(fresh.length)pool=fresh;if(!pool.length)return;const p=pool[Math.floor(Math.random()*pool.length)];$('q').value=p.name;renderEvents();setTimeout(()=>document.querySelector('#grid .card')?.scrollIntoView({behavior:'smooth',block:'center'}),50)};
+$('favBtn').onclick=()=>{favOnly=!favOnly;$('favBtn').textContent=favOnly?'★ Showing Favorites':'★ Favorites';renderEvents()};
+$('locationsBtn').onclick=()=>{renderLocations();openOverlay('locationsOverlay')};
+$('detailsCopyName').onclick=()=>{const e=events.find(x=>String(x.id)===String(detailsEventId));if(e)copy(e.name,$('detailsCopyName'))};
+$('detailsCopyF3').onclick=()=>{const e=events.find(x=>String(x.id)===String(detailsEventId));if(e){markRecent(e.name);copy(e.text,$('detailsCopyF3'))}};
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeOverlays);document.querySelectorAll('.overlay').forEach(x=>x.onclick=e=>{if(e.target===x)closeOverlays()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlays()});
+
+(async()=>{renderRecent();await Promise.all([loadAuth(),loadEvents(),loadParties(),loadLocations()]);renderEvents();renderParties();renderLocations()})();
+</script>
+</body></html>
