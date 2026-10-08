@@ -129,7 +129,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 
 <main class="wrap">
   <div class="tabs"><button class="tab active" data-tab="events">Events</button><button class="tab" data-tab="parties">Parties</button><button id="staffBtn" class="tab hidden">Staff</button><button id="queueBtn" class="tab hidden">Approval Queue</button></div>
-  <div id="status" class="status"></div>
+  <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <section id="eventsView">
     <div class="hubMast" aria-label="Liberty99 Events">
@@ -161,9 +161,9 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
       <div class="partyLibrary">
         <div class="partyMeta"><span id="partyShown"></span> of <span id="partyTotal"></span> templates available</div>
         <section class="partyGrid" id="partyGrid"></section>
-        <div class="partyEmpty" id="partyEmpty">No matching party templates.</div>
+        <div class="partyEmpty" id="partyEmpty"><strong id="partyEmptyTitle">No matching templates</strong><p id="partyEmptyDesc">Try another search or category.</p><button type="button" id="clearPartyFilters">Clear party filters</button></div>
       </div>
-      <aside class="partyBuilder">
+      <aside class="partyBuilder" id="partyBuilder">
         <div class="builderTop"><div><h2 id="builderTitle">Select a template</h2><div class="note" id="builderCategory">Choose one from the library.</div></div><span class="tag">LIVE PREVIEW</span></div>
         <div class="builderFields">
           <div class="field"><label>Name / gang / organization</label><input id="partyName" maxlength="24" placeholder="e.g. VAGOS"></div>
@@ -173,7 +173,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
         <div class="builderPreview">
           <label><span>F3 preview</span><span id="partyCount" class="previewCount">0/80</span></label>
           <div id="partyPreview" class="previewBox">Select a template to start.</div>
-          <div class="helper">Keep it at 80 characters or less for F3.</div>
+          <div class="partyMeter" id="partyMeter" role="progressbar" aria-label="F3 announcement length" aria-valuemin="0" aria-valuemax="80" aria-valuenow="0"><span id="partyMeterFill"></span></div><div class="helper" id="partyLengthHint" aria-live="polite">Select a template to start.</div>
         </div>
         <div class="builderActions"><button id="copyPartyF3" class="primary" disabled>Copy F3</button><button id="clearPartyFields">Clear Fields</button></div>
         <div id="partyBuilderAdmin" class="builderAdmin hidden"><button id="editSelectedParty">Edit Template</button><button id="disableSelectedParty" class="danger">Disable Template</button></div>
@@ -195,7 +195,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 
 <div class="overlay" id="staffOverlay"><div class="modal">
   <div class="modalTop"><div><h2>Staff Management</h2><div class="note">Owner and delegated Staff Managers can maintain the team. Only the Owner can appoint Staff Managers.</div></div><button class="close" data-close>✕</button></div>
-  <div class="modalActions" style="justify-content:flex-start"><button id="addStaffBtn" class="primary">＋ Add Staff</button><span class="queueCount" id="staffCount">0 staff</span></div>
+  <div class="staffToolbar"><button id="addStaffBtn" class="primary">＋ Add Staff</button><span class="queueCount" id="staffCount">0 staff</span><span id="staffActivity" class="staffActivity" aria-live="polite"></span></div>
   <div id="staffList" class="queueSection"></div>
 </div></div>
 <div class="overlay" id="staffFormOverlay"><div class="modal">
@@ -231,7 +231,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
     <div><h2>📍 Liberty99 Locations <span class="queueCount" id="locationCount">0 locations</span></h2><div class="note">Approved shared locations from the staff database.</div></div>
     <div class="locTopActions"><button id="suggestLocationBtn" class="primary hidden">＋ Suggest Location</button><button class="close" data-close>✕</button></div>
   </div>
-  <input class="locSearch" id="locQ" placeholder="Search locations…" autocomplete="off">
+  <label class="visuallyHidden" for="locQ">Search locations</label><input class="locSearch" id="locQ" placeholder="Search locations…" autocomplete="off"><div class="locResultsSummary" id="locResultsSummary" aria-live="polite"></div>
   <div class="locationsBody"><div class="locList" id="locList"></div><aside class="locationPreview" id="locationPreview"><div class="locationPreviewEmpty">Select a location to see its screenshot and details.</div></aside></div>
 </div></div>
 
@@ -296,6 +296,14 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 </div></div>
 
 
+<div class="overlay" id="confirmOverlay"><div class="modal confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmDescription">
+  <div class="confirmIcon" aria-hidden="true">!</div>
+  <h2 id="confirmTitle">Confirm action</h2>
+  <p id="confirmDescription" class="confirmDesc"></p>
+  <div id="confirmReasonWrap" class="field hidden"><label for="confirmReason">Rejection reason <span>(optional)</span></label><textarea id="confirmReason" rows="3" maxlength="1000" placeholder="Explain the decision to the submitter (optional)"></textarea></div>
+  <div class="confirmActions"><button type="button" id="confirmCancel">Cancel</button><button type="button" id="confirmProceed" class="primary">Confirm</button></div>
+</div></div>
+
 <div class="overlay" id="cropperOverlay"><div class="modal cropperModal">
   <div class="modalTop"><div><h2>✦ Edit Screenshot</h2><div class="note" id="cropperFileName">Crop, zoom and reposition before uploading.</div></div><button class="close" type="button" id="cropCancelBtn">✕</button></div>
   <div class="cropperShell">
@@ -351,11 +359,43 @@ async function copy(v,b){
 }
 function showStatus(msg,error=false){const x=$('status');x.textContent=msg;x.className='status show'+(error?' error':'');setTimeout(()=>{if(x.textContent===msg)x.className='status'},5000)}
 async function api(path,options={}){const headers={...(options.headers||{})};if(options.body&&!(options.body instanceof FormData)&&!headers['Content-Type'])headers['Content-Type']='application/json';const r=await fetch(API+path,{credentials:'include',...options,headers});let data={};try{data=await r.json()}catch{}if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);return data}
-let overlayDepth=30,hostPreviousFocus=null;
-function openOverlay(id){const el=$(id);if(!el)return;overlayDepth+=2;el.style.zIndex=String(overlayDepth);el.classList.add('show')}
-function closeOverlay(target){const el=typeof target==='string'?$(target):target?.closest?.('.overlay')||target;if(el?.classList?.contains('overlay')){el.classList.remove('show');if(el.id==='eventDetailsOverlay'&&hostPreviousFocus?.isConnected){hostPreviousFocus.focus();hostPreviousFocus=null}}}
-function closeTopOverlay(){const open=[...document.querySelectorAll('.overlay.show')];if(!open.length)return;open.sort((a,b)=>(Number(a.style.zIndex)||20)-(Number(b.style.zIndex)||20));closeOverlay(open[open.length-1])}
-function closeOverlays(){document.querySelectorAll('.overlay.show').forEach(x=>x.classList.remove('show'))}
+let overlayDepth=30;
+const overlayFocusReturn=new WeakMap();
+let confirmResolver=null;
+const openedOverlays=()=>[...document.querySelectorAll('.overlay.show')].sort((a,b)=>(Number(a.style.zIndex)||20)-(Number(b.style.zIndex)||20));
+const focusables=el=>[...el.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')].filter(x=>x.getClientRects().length&&!x.closest('.hidden'));
+function openOverlay(id){
+ const el=$(id);if(!el)return;
+ if(!el.classList.contains('show'))overlayFocusReturn.set(el,document.activeElement);
+ overlayDepth+=2;el.style.zIndex=String(overlayDepth);el.classList.add('show');
+ const dialog=el.querySelector('.modal');if(dialog){dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');if(!dialog.hasAttribute('tabindex'))dialog.setAttribute('tabindex','-1')}
+ (el.querySelector('[autofocus]')||focusables(el)[0]||dialog)?.focus({preventScroll:true});
+}
+function closeOverlay(target){
+ const el=typeof target==='string'?$(target):target?.closest?.('.overlay')||target;
+ if(!el?.classList?.contains('overlay')||!el.classList.contains('show'))return;
+ const previous=overlayFocusReturn.get(el);el.classList.remove('show');
+ if(el.id==='confirmOverlay'&&confirmResolver){const resolve=confirmResolver;confirmResolver=null;resolve(null)}
+ const top=openedOverlays().at(-1);
+ if(top){if(previous?.isConnected&&top.contains(previous)&&previous.getClientRects().length)previous.focus({preventScroll:true});else (focusables(top)[0]||top.querySelector('.modal'))?.focus({preventScroll:true})}
+ else if(previous?.isConnected&&previous.getClientRects().length)previous.focus({preventScroll:true});
+}
+function closeTopOverlay(){const top=openedOverlays().at(-1);if(top)closeOverlay(top)}
+function closeOverlays(){const first=openedOverlays()[0];const back=first&&overlayFocusReturn.get(first);openedOverlays().reverse().forEach(el=>el.classList.remove('show'));if(confirmResolver){const resolve=confirmResolver;confirmResolver=null;resolve(null)}if(back?.isConnected&&back.getClientRects().length)back.focus({preventScroll:true})}
+function requestConfirmation({title,description,verb='Confirm',danger=false,reason=false}){
+ if(confirmResolver)return Promise.resolve(null);
+ $('confirmTitle').textContent=title;
+ $('confirmDescription').textContent=description;
+ $('confirmReasonWrap').classList.toggle('hidden',!reason);
+ $('confirmReason').value='';
+ $('confirmProceed').textContent=verb;
+ $('confirmProceed').classList.toggle('dangerConfirm',danger);
+ openOverlay('confirmOverlay');
+ $('confirmCancel').focus({preventScroll:true});
+ return new Promise(resolve=>{confirmResolver=resolve});
+}
+$('confirmCancel').onclick=()=>closeOverlay('confirmOverlay');
+$('confirmProceed').onclick=()=>{if(!confirmResolver)return;const done=confirmResolver;confirmResolver=null;const data={reason:$('confirmReason').value};closeOverlay('confirmOverlay');done(data)};
 
 let eventsLoading=true,eventsLoadFailed=false,randomEventId=null;
 let member=null,events=[],parties=[],locations=[],favs=new Set(read('l99Favs',[])),recent=read('l99Recent',[]).slice(0,8),active='All',favOnly=false,partyActive='All',selectedPartyId=null,detailsEventId=null,selectedLocationId=null,viewerImages=[],viewerIndex=0,viewerZoom=1,editingLocationImages=[],cropper=null,cropQueue=[],cropResults=[],cropResolve=null,suppressImageChange=false;
@@ -396,20 +436,31 @@ function renderEvents(){
  document.querySelectorAll('[data-copyname]').forEach(b=>b.onclick=()=>copy(b.dataset.copyname,b));
  document.querySelectorAll('[data-host]').forEach(b=>b.onclick=()=>openEventDetails(b.dataset.host));
  document.querySelectorAll('[data-edit-event]').forEach(b=>b.onclick=()=>{const e=events.find(x=>String(x.id)===String(b.dataset.editEvent));if(e)openEventForm({...e,status:'approved'})});
- document.querySelectorAll('[data-disable-event]').forEach(b=>b.onclick=async()=>{if(!confirm('Disable this approved Event?'))return;try{await api(`/api/admin/events/${b.dataset.disableEvent}/disable`,{method:'PATCH'});await loadEvents();showStatus('Event disabled.')}catch(e){showStatus(e.message,true)}});
+ document.querySelectorAll('[data-disable-event]').forEach(b=>b.onclick=async()=>{if(!await requestConfirmation({title:'Disable event?',description:'This approved event will no longer be available for hosting.',verb:'Disable event',danger:true}))return;try{await api(`/api/admin/events/${b.dataset.disableEvent}/disable`,{method:'PATCH'});await loadEvents();showStatus('Event disabled.')}catch(e){showStatus(e.message,true)}});
 }
 
 function buildPartyFilters(){const cats=['All',...new Set(parties.map(p=>p.category))];if(!cats.includes(partyActive))partyActive='All';$('partyFilters').innerHTML=cats.map(c=>`<button class="filter ${c===partyActive?'active':''}" data-pcat="${esc(c)}">${esc(c)}</button>`).join('');document.querySelectorAll('[data-pcat]').forEach(b=>b.onclick=()=>{partyActive=b.dataset.pcat;buildPartyFilters();renderParties()})}
 function renderTemplate(t,n,d,e){return String(t||'').replaceAll('{name}',n||'').replaceAll('{detail}',d||'').replaceAll('{extra}',e||'')}
 function selectedParty(){return parties.find(p=>String(p.id)===String(selectedPartyId))||null}
-function selectParty(id,resetFields=true){const p=parties.find(x=>String(x.id)===String(id));if(!p)return;selectedPartyId=p.id;$('builderTitle').textContent=`${p.icon||'🎉'} ${p.name}`;$('builderCategory').textContent=p.category||'';if(resetFields){$('partyName').value=p.default_name||'';$('partyDetail').value=p.default_detail||'';$('partyExtra').value=p.default_extra||''}updatePartyBuilder();$('partyBuilderAdmin').classList.toggle('hidden',!(member?.can_approve_parties));renderParties()}
-function updatePartyBuilder(){const p=selectedParty();if(!p){$('partyPreview').textContent='Select a template to start.';$('partyCount').textContent='0/80';$('partyCount').classList.remove('over');$('copyPartyF3').disabled=true;return}const out=renderTemplate(p.template,$('partyName').value,$('partyDetail').value,$('partyExtra').value);const len=[...out].length;$('partyPreview').textContent=out;$('partyCount').textContent=len+'/80';$('partyCount').classList.toggle('over',len>80);$('copyPartyF3').disabled=!out||len>80}
+function selectParty(id,resetFields=true){const p=parties.find(x=>String(x.id)===String(id));if(!p)return;selectedPartyId=p.id;$('builderTitle').textContent=`${p.icon||'🎉'} ${p.name}`;$('builderCategory').textContent=p.category||'';if(resetFields){$('partyName').value=p.default_name||'';$('partyDetail').value=p.default_detail||'';$('partyExtra').value=p.default_extra||''}updatePartyBuilder();$('partyBuilderAdmin').classList.toggle('hidden',!(member?.can_edit_parties||member?.can_disable_parties));renderParties();if(window.matchMedia('(max-width:900px)').matches)$('partyBuilder').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth',block:'start'});$('partyName').focus({preventScroll:true})}
+function updatePartyBuilder(){
+ const p=selectedParty();const out=p?renderTemplate(p.template,$('partyName').value,$('partyDetail').value,$('partyExtra').value):'';
+ const len=[...out].length;
+ $('partyPreview').textContent=p?out:'Select a template to start.';
+ $('partyCount').textContent=len+'/80';$('partyCount').classList.toggle('over',len>80);
+ $('copyPartyF3').disabled=!p||!out||len>80;
+ $('partyMeterFill').style.width=Math.min(100,len/80*100)+'%';
+ $('partyMeter').setAttribute('aria-valuenow',String(Math.min(80,len)));
+ $('partyMeter').classList.toggle('nearLimit',len>=71&&len<=80);
+ $('partyMeter').classList.toggle('overLimit',len>80);
+ $('partyLengthHint').textContent=!p?'Select a template to start.':len>80?`Too long — remove ${len-80} character${len-80===1?'':'s'} to copy.`:len>=71?`${80-len} characters remaining · ready to copy`:'Ready to copy · maximum 80 characters.';
+}
 function renderParties(){
  const term=$('partyQ').value.trim().toLowerCase();const list=parties.filter(p=>(partyActive==='All'||p.category===partyActive)&&(!term||`${p.name} ${p.category} ${p.template} ${p.description||''}`.toLowerCase().includes(term)));
- $('partyTotal').textContent=parties.length;$('partyShown').textContent=list.length;$('partyEmpty').style.display=list.length?'none':'block';
- if(parties.length && !selectedParty())selectedPartyId=parties[0].id;
+ $('partyTotal').textContent=parties.length;$('partyShown').textContent=list.length;$('partyEmpty').style.display=list.length?'none':'block';$('partyEmptyTitle').textContent=parties.length?'No matching templates':'No templates available';$('partyEmptyDesc').textContent=parties.length?'Try another name or category.':'The Party template library is empty.';
+ if(!parties.length){selectedPartyId=null;$('builderTitle').textContent='Select a template';$('builderCategory').textContent='Choose one from the library.';$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';$('partyBuilderAdmin').classList.add('hidden')}else if(!selectedParty())selectedPartyId=parties[0].id;
  if(selectedParty() && !$('partyName').value && !$('partyDetail').value && !$('partyExtra').value){const p=selectedParty();$('builderTitle').textContent=`${p.icon||'🎉'} ${p.name}`;$('builderCategory').textContent=p.category||'';$('partyName').value=p.default_name||'';$('partyDetail').value=p.default_detail||'';$('partyExtra').value=p.default_extra||'';updatePartyBuilder()}
- $('partyGrid').innerHTML=list.map(p=>{const out=renderTemplate(p.template,p.default_name,p.default_detail,p.default_extra);return `<article class="partyCard ${String(p.id)===String(selectedPartyId)?'selected':''}"><div class="head"><span class="ico">${esc(p.icon||'🎉')}</span><div class="title"><strong>${esc(p.name)}</strong><div class="tags"><span class="tag">${esc(p.category)}</span><span class="templateBadge">TEMPLATE</span></div></div></div><div class="announcement">${esc(out)}</div><div class="actions"><button class="primary" data-puse="${p.id}">Use Template</button><span class="count">${[...out].length}/80</span></div></article>`}).join('');
+ $('partyGrid').innerHTML=list.map(p=>{const out=renderTemplate(p.template,p.default_name,p.default_detail,p.default_extra);return `<article class="partyCard ${String(p.id)===String(selectedPartyId)?'selected':''}"><div class="head"><span class="ico">${esc(p.icon||'🎉')}</span><div class="title"><strong>${esc(p.name)}</strong><div class="tags"><span class="tag">${esc(p.category)}</span><span class="templateBadge">TEMPLATE</span></div></div></div><div class="announcement">${esc(out)}</div><div class="actions"><button class="primary" data-puse="${esc(p.id)}" aria-pressed="${String(p.id)===String(selectedPartyId)}">${String(p.id)===String(selectedPartyId)?"✓ Selected":"Use Template"}</button><span class="count">${[...out].length}/80</span></div></article>`}).join('');
  document.querySelectorAll('[data-puse]').forEach(b=>b.onclick=()=>selectParty(b.dataset.puse,true));
  updatePartyBuilder();
 }
@@ -423,7 +474,7 @@ function updateLocationImageHelp(hasExisting=false){const label=$('locImageLabel
 
 function dataTransferFiles(files){const dt=new DataTransfer();files.forEach(f=>dt.items.add(f));return dt.files}
 function canvasToFile(canvas,original){return new Promise((resolve,reject)=>{const type=original.type==='image/png'?'image/png':'image/jpeg';canvas.toBlob(blob=>{if(!blob)return reject(new Error('Could not create edited screenshot.'));const base=(original.name||'location').replace(/\.[^.]+$/,'');resolve(new File([blob],`${base}-edited.${type==='image/png'?'png':'jpg'}`,{type,lastModified:Date.now()}))},type,type==='image/jpeg'?.92:undefined)})}
-function closeCropper(){if(cropper){cropper.destroy();cropper=null}$('cropperOverlay').classList.remove('show')}
+function closeCropper(){if(cropper){cropper.destroy();cropper=null}closeOverlay('cropperOverlay')}
 function editOneScreenshot(file){return new Promise((resolve)=>{cropResolve=resolve;const url=URL.createObjectURL(file);$('cropperFileName').textContent=`${file.name} • crop, zoom and reposition before uploading.`;$('cropperImage').src=url;document.querySelectorAll('#cropAspect [data-ratio]').forEach((b,i)=>b.classList.toggle('active',i===0));openOverlay('cropperOverlay');requestAnimationFrame(()=>{cropper?.destroy();cropper=new Cropper($('cropperImage'),{viewMode:1,dragMode:'move',autoCropArea:.92,responsive:true,background:false,zoomOnWheel:true,zoomOnTouch:true,movable:true,rotatable:true,scalable:false,ready(){URL.revokeObjectURL(url)}})});$('cropKeepOriginal').onclick=()=>{closeCropper();resolve(file)};$('cropCancelBtn').onclick=()=>{closeCropper();resolve(null)};$('cropApply').onclick=async()=>{try{const canvas=cropper.getCroppedCanvas({maxWidth:2560,maxHeight:1440,imageSmoothingEnabled:true,imageSmoothingQuality:'high'});const edited=await canvasToFile(canvas,file);closeCropper();resolve(edited)}catch(e){showStatus(e.message||'Could not edit screenshot.',true)}}})}
 async function processSelectedScreenshots(files){const results=[];for(const file of files){const out=await editOneScreenshot(file);if(out)results.push(out)}return results}
 async function handleLocationImagesChanged(){if(suppressImageChange)return;const selected=[...$('locImages').files];if(!selected.length){renderNewUploadPreview();return}if(selected.length>4){showStatus('Maximum 4 screenshots per Location.',true);$('locImages').value='';renderNewUploadPreview();return}try{const edited=await processSelectedScreenshots(selected);suppressImageChange=true;$('locImages').files=dataTransferFiles(edited);suppressImageChange=false;renderNewUploadPreview();if(edited.length)showStatus(`${edited.length} screenshot${edited.length===1?'':'s'} ready to upload.`)}catch(e){suppressImageChange=false;showStatus(e.message||'Could not prepare screenshots.',true)}}
@@ -434,9 +485,9 @@ function renderImageViewer(){const imgEl=$('viewerImage'),strip=$('viewerStrip')
 function viewerStep(delta){if(!viewerImages.length)return;viewerIndex=(viewerIndex+delta+viewerImages.length)%viewerImages.length;viewerZoom=1;renderImageViewer()}
 function viewerZoomBy(delta){viewerZoom=Math.max(.5,Math.min(3,Math.round((viewerZoom+delta)*100)/100));renderImageViewer()}
 
-function renderLocationPreview(){const box=$('locationPreview');if(!box)return;const x=locations.find(l=>String(l.id)===String(selectedLocationId));if(!x){box.innerHTML='<div class="locationPreviewEmpty">Select a location to see its screenshot and details.</div>';return}const images=x.images||[];const hero=images[0]?`<img id="locationHeroImage" src="${esc(locationImageSrc(images[0]))}" alt="${esc(x.name)}">`:'<span>No screenshot yet<br><small>Edit this Location to add one.</small></span>';box.innerHTML=`<div class="locationHero" ${images[0]?'data-open-location-viewer="0"':''}>${hero}</div>${images.length?`<div class="locationGalleryMeta"><div class="small">${images.length} screenshot${images.length===1?'':'s'}</div><div class="small">Click image to enlarge</div></div>`:''}${images.length>1?`<div class="locationGallery">${images.map((im,i)=>`<button class="${i===0?'active':''}" data-location-image="${i}"><img src="${esc(locationImageSrc(im))}" alt=""></button>`).join('')}</div>`:''}<div class="locationPreviewTitle"><strong>${esc(x.name)}</strong></div><div class="coords">${esc(x.coordinates||'')}</div><div class="locationPreviewActions"><button data-preview-copy>Copy Coords</button>${images.length?`<button data-preview-view>View Images</button>`:''}${member?.can_edit_locations?`<button data-preview-edit>Edit</button>`:''}${member?.can_disable_locations?`<button class="danger" data-preview-disable>Disable</button>`:''}</div><div class="locationPreviewInfo">${x.description?`<div class="detailLabel">Description</div><div class="detailValue">${esc(x.description)}</div>`:''}${x.notes?`<div class="detailLabel">Notes</div><div class="detailValue">${esc(x.notes)}</div>`:''}</div>`;box.querySelector('[data-preview-copy]')?.addEventListener('click',e=>copy(x.coordinates||'',e.currentTarget));box.querySelector('[data-preview-view]')?.addEventListener('click',()=>openImageViewer(images,0,x.name));box.querySelector('[data-preview-edit]')?.addEventListener('click',()=>openLocationForm({...x,status:'approved'}));box.querySelector('[data-preview-disable]')?.addEventListener('click',()=>disableLocation(x.id));box.querySelector('[data-open-location-viewer]')?.addEventListener('click',()=>openImageViewer(images,0,x.name));box.querySelectorAll('[data-location-image]').forEach(b=>b.onclick=()=>{const idx=Number(b.dataset.locationImage);const im=images[idx];if(im&&$('locationHeroImage')){const hero=$('locationHeroImage');hero.style.opacity='.25';setTimeout(()=>{hero.src=locationImageSrc(im);hero.style.opacity='1'},90)}box.querySelectorAll('[data-location-image]').forEach(y=>y.classList.toggle('active',y===b));});box.querySelectorAll('[data-location-image]').forEach(b=>b.addEventListener('dblclick',()=>openImageViewer(images,Number(b.dataset.locationImage),x.name)))}
-async function disableLocation(id){if(!confirm('Disable this approved Location? Existing Events keep their saved location name.'))return;try{await api(`/api/admin/locations/${id}/disable`,{method:'PATCH'});await loadLocations();showStatus('Location disabled.')}catch(e){showStatus(e.message,true)}}
-function renderLocations(){const t=$('locQ').value.trim().toLowerCase();const list=locations.filter(x=>`${x.name} ${x.coordinates||''} ${x.description||''} ${x.notes||''}`.toLowerCase().includes(t));if($('locationCount'))$('locationCount').textContent=`${locations.length} location${locations.length===1?'':'s'}`;if(list.length&&!list.some(x=>String(x.id)===String(selectedLocationId)))selectedLocationId=list[0].id;if(!list.length)selectedLocationId=null;$('locList').innerHTML=list.map(x=>{const first=x.images?.[0];return `<div class="loc ${String(x.id)===String(selectedLocationId)?'selected':''}" data-select-location="${x.id}"><div class="locThumb">${first?`<img src="${esc(locationImageSrc(first))}" alt="${esc(x.name)}">`:'<span>No screenshot</span>'}</div><div class="locMain"><strong>${esc(x.name)}</strong><div class="coords">${esc(x.coordinates||'')}</div>${x.description?`<div class="locationNote">${esc(x.description)}</div>`:''}</div><div class="actions"><button data-coords="${esc(x.coordinates||'')}">Copy Coords</button>${member?.can_edit_locations?`<button data-edit-location="${x.id}">Edit</button>`:''}${member?.can_disable_locations?`<button class="danger" data-disable-location="${x.id}">Disable</button>`:''}</div></div>`}).join('')||'<div class="empty" style="display:block">No matching locations.</div>';document.querySelectorAll('[data-select-location]').forEach(row=>row.onclick=e=>{if(e.target.closest('button'))return;selectedLocationId=row.dataset.selectLocation;renderLocations()});document.querySelectorAll('[data-coords]').forEach(b=>b.onclick=()=>copy(b.dataset.coords,b));document.querySelectorAll('[data-edit-location]').forEach(b=>b.onclick=()=>{const x=locations.find(l=>String(l.id)===String(b.dataset.editLocation));if(x)openLocationForm({...x,status:'approved'})});document.querySelectorAll('[data-disable-location]').forEach(b=>b.onclick=()=>disableLocation(b.dataset.disableLocation));renderLocationPreview()}
+function renderLocationPreview(){const box=$('locationPreview');if(!box)return;const x=locations.find(l=>String(l.id)===String(selectedLocationId));if(!x){box.innerHTML='<div class="locationPreviewEmpty">Select a location to see its screenshot and details.</div>';return}const images=x.images||[];const hero=images[0]?`<img id="locationHeroImage" src="${esc(locationImageSrc(images[0]))}" alt="${esc(x.name)}">`:'<span>No screenshot yet<br><small>Edit this Location to add one.</small></span>';box.innerHTML=`<div class="locationHero" ${images[0]?'data-open-location-viewer="0" role="button" tabindex="0" aria-label="View screenshots for '+esc(x.name)+'"':''}>${hero}</div>${images.length?`<div class="locationGalleryMeta"><div class="small">${images.length} screenshot${images.length===1?'':'s'}</div><div class="small">Click image to enlarge</div></div>`:''}${images.length>1?`<div class="locationGallery">${images.map((im,i)=>`<button class="${i===0?'active':''}" data-location-image="${i}"><img src="${esc(locationImageSrc(im))}" alt=""></button>`).join('')}</div>`:''}<div class="locationPreviewTitle"><strong>${esc(x.name)}</strong></div><div class="coords">${esc(x.coordinates||'')}</div><div class="locationPreviewActions"><button data-preview-copy>Copy Coords</button>${images.length?`<button data-preview-view>View Images</button>`:''}${member?.can_edit_locations?`<button data-preview-edit>Edit</button>`:''}${member?.can_disable_locations?`<button class="danger" data-preview-disable>Disable</button>`:''}</div><div class="locationPreviewInfo">${x.description?`<div class="detailLabel">Description</div><div class="detailValue">${esc(x.description)}</div>`:''}${x.notes?`<div class="detailLabel">Notes</div><div class="detailValue">${esc(x.notes)}</div>`:''}</div>`;box.querySelector('[data-preview-copy]')?.addEventListener('click',e=>copy(x.coordinates||'',e.currentTarget));box.querySelector('[data-preview-view]')?.addEventListener('click',()=>openImageViewer(images,0,x.name));box.querySelector('[data-preview-edit]')?.addEventListener('click',()=>openLocationForm({...x,status:'approved'}));box.querySelector('[data-preview-disable]')?.addEventListener('click',()=>disableLocation(x.id));box.querySelector('[data-open-location-viewer]')?.addEventListener('click',()=>openImageViewer(images,0,x.name));box.querySelector('[data-open-location-viewer]')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openImageViewer(images,0,x.name)}});box.querySelectorAll('[data-location-image]').forEach(b=>b.onclick=()=>{const idx=Number(b.dataset.locationImage);const im=images[idx];if(im&&$('locationHeroImage')){const hero=$('locationHeroImage');hero.style.opacity='.25';setTimeout(()=>{hero.src=locationImageSrc(im);hero.style.opacity='1'},90)}box.querySelectorAll('[data-location-image]').forEach(y=>y.classList.toggle('active',y===b));});box.querySelectorAll('[data-location-image]').forEach(b=>b.addEventListener('dblclick',()=>openImageViewer(images,Number(b.dataset.locationImage),x.name)))}
+async function disableLocation(id){if(!await requestConfirmation({title:'Disable location?',description:'The location will no longer be available. Existing events retain their saved location name.',verb:'Disable location',danger:true}))return;try{await api(`/api/admin/locations/${id}/disable`,{method:'PATCH'});await loadLocations();showStatus('Location disabled.')}catch(e){showStatus(e.message,true)}}
+function renderLocations(){const t=$('locQ').value.trim().toLowerCase();const list=locations.filter(x=>`${x.name} ${x.coordinates||''} ${x.description||''} ${x.notes||''}`.toLowerCase().includes(t));if($('locationCount'))$('locationCount').textContent=`${locations.length} location${locations.length===1?'':'s'}`;$('locResultsSummary').textContent=`${list.length} of ${locations.length} locations shown`;if(list.length&&!list.some(x=>String(x.id)===String(selectedLocationId)))selectedLocationId=list[0].id;if(!list.length)selectedLocationId=null;$('locList').innerHTML=list.map(x=>{const first=x.images?.[0];return `<div class="loc ${String(x.id)===String(selectedLocationId)?'selected':''}" data-select-location="${x.id}"><div class="locThumb">${first?`<img src="${esc(locationImageSrc(first))}" alt="${esc(x.name)}">`:'<span>No screenshot</span>'}</div><div class="locMain"><strong>${esc(x.name)}</strong><div class="coords">${esc(x.coordinates||'')}</div>${x.description?`<div class="locationNote">${esc(x.description)}</div>`:''}</div><div class="actions"><button type="button" data-view-location="${esc(x.id)}" aria-label="Show details for ${esc(x.name)}">View</button><button data-coords="${esc(x.coordinates||'')}" ${x.coordinates?'':'disabled'}>Copy Coords</button>${member?.can_edit_locations?`<button data-edit-location="${x.id}">Edit</button>`:''}${member?.can_disable_locations?`<button class="danger" data-disable-location="${x.id}">Disable</button>`:''}</div></div>`}).join('')||`<div class="locationSearchEmpty"><strong>${locations.length?'No matching locations':'No locations available'}</strong><p>${locations.length?'Try another search.':'Approved locations will appear here.'}</p>${t?'<button type="button" id="clearLocationSearch">Clear search</button>':''}</div>`;document.querySelectorAll('[data-select-location]').forEach(row=>row.onclick=e=>{if(e.target.closest('button'))return;selectedLocationId=row.dataset.selectLocation;renderLocations()});document.querySelectorAll('[data-view-location]').forEach(b=>b.onclick=()=>{selectedLocationId=b.dataset.viewLocation;renderLocations()});$('clearLocationSearch')?.addEventListener('click',()=>{$('locQ').value='';renderLocations();$('locQ').focus()});document.querySelectorAll('[data-coords]').forEach(b=>b.onclick=()=>copy(b.dataset.coords,b));document.querySelectorAll('[data-edit-location]').forEach(b=>b.onclick=()=>{const x=locations.find(l=>String(l.id)===String(b.dataset.editLocation));if(x)openLocationForm({...x,status:'approved'})});document.querySelectorAll('[data-disable-location]').forEach(b=>b.onclick=()=>disableLocation(b.dataset.disableLocation));renderLocationPreview()}
 function renderLocationFormImages(item){const currentBox=$('locExistingImages');if(!currentBox)return;editingLocationImages=item?.images||[];currentBox.innerHTML=editingLocationImages.length?editingLocationImages.map((im,i)=>`<button type="button" data-current-image="${i}"><img src="${esc(locationImageSrc(im))}" alt="Current location screenshot ${i+1}"></button>`).join(''):'<div class="note">No current screenshots.</div>';currentBox.querySelectorAll('[data-current-image]').forEach(b=>b.onclick=()=>openImageViewer(editingLocationImages,Number(b.dataset.currentImage),item?.name||'Current Screenshots'));updateLocationImageHelp(editingLocationImages.length>0);renderNewUploadPreview()}
 function openLocationForm(item=null){$('locationEditId').value=item?.id||'';$('locationEditStatus').value=item?.status||'';$('locationFormTitle').textContent=item?(item.status==='approved'?'Edit Approved Location':'Edit Pending Location'):'＋ Suggest Location';$('locationSaveBtn').textContent=item?'Save Changes':'Submit for Approval';$('locName').value=item?.name||'';$('locCoords').value=item?.coordinates||'';$('locDescription').value=item?.description||'';$('locNotes').value=item?.notes||'';$('locImages').value='';setLocationImageMode(item?.images?.length?'append':'replace');renderLocationFormImages(item);openOverlay('locationSubmitOverlay')}
 function linkedEventLocation(e){
@@ -447,7 +498,7 @@ function linkedEventLocation(e){
 function eventCoords(e){return e?.location_coordinates||linkedEventLocation(e)?.coordinates||''}
 function openEventDetails(id){
  const e=events.find(x=>String(x.id)===String(id));if(!e)return;
- detailsEventId=e.id;hostPreviousFocus=document.activeElement;
+ detailsEventId=e.id;
  const loc=linkedEventLocation(e),coords=eventCoords(e);
  $('detailsTitle').textContent=`${e.icon||'🎉'} ${e.name}`;
  $('detailsMeta').textContent=`${e.category||'Uncategorized'} • ${setupTag(e)}`;
@@ -480,7 +531,7 @@ $('copyPartyF3').onclick=()=>{const p=selectedParty();if(!p)return;const out=ren
 $('clearPartyFields').onclick=()=>{$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';updatePartyBuilder()};
 $('partyReset').onclick=()=>{const p=selectedParty();if(p)selectParty(p.id,true)};
 $('editSelectedParty').onclick=()=>{const p=selectedParty();if(p&&member?.can_edit_parties)openPartyForm({...p,status:'approved'})};
-$('disableSelectedParty').onclick=async()=>{const p=selectedParty();if(!p||!member?.can_disable_parties)return;if(!confirm(`Disable approved template "${p.name}"?`))return;try{await api(`/api/admin/parties/${p.id}/disable`,{method:'PATCH'});selectedPartyId=null;$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';await loadParties();showStatus('Parties template disabled.')}catch(e){showStatus(e.message,true)}};
+$('disableSelectedParty').onclick=async()=>{const p=selectedParty();if(!p||!member?.can_disable_parties)return;if(!await requestConfirmation({title:'Disable party template?',description:`${p.name} will no longer be available in the Parties toolkit.`,verb:'Disable template',danger:true}))return;try{await api(`/api/admin/parties/${p.id}/disable`,{method:'PATCH'});selectedPartyId=null;$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';await loadParties();showStatus('Parties template disabled.')}catch(e){showStatus(e.message,true)}};
 
 $('staffForm').onsubmit=async e=>{e.preventDefault();const id=$('staffEditId').value;const body={display_name:$('staffName').value.trim(),department:$('staffDepartment').value,can_submit_events:$('staffSubmitEvents').checked,can_approve_events:$('staffApproveEvents').checked,can_edit_events:$('staffEditEvents').checked,can_disable_events:$('staffDisableEvents').checked,can_submit_parties:$('staffSubmitParties').checked,can_approve_parties:$('staffApproveParties').checked,can_edit_parties:$('staffEditParties').checked,can_disable_parties:$('staffDisableParties').checked,can_submit_locations:$('staffSubmitLocations').checked,can_approve_locations:$('staffApproveLocations').checked,can_edit_locations:$('staffEditLocations').checked,can_disable_locations:$('staffDisableLocations').checked};if(member?.is_owner)body.can_manage_staff=$('staffManageStaff').checked;if(id)body.is_active=$('staffActive').checked;else body.discord_id=$('staffDiscordId').value.trim();try{await api(id?`/api/admin/members/${id}`:'/api/admin/members',{method:id?'PATCH':'POST',body:JSON.stringify(body)});closeOverlays();await loadStaff();openOverlay('staffOverlay');showStatus(id?'Staff member updated.':'Staff member added.')}catch(err){showStatus(err.message,true)}};
 $('eventForm').onsubmit=async e=>{e.preventDefault();const id=$('eventEditId').value;const status=$('eventEditStatus').value;const body={name:$('evName').value.trim(),category:$('evCategory').value.trim(),announcement:$('evF3').value.trim(),location_id:$('evLocation').value?Number($('evLocation').value):null,setup:$('evSetup').value||null,instructions:$('evHow').value.trim()||null};try{await api(id?`/api/admin/events/${id}`:'/api/events/submit',{method:id?'PATCH':'POST',body:JSON.stringify(body)});closeOverlays();if(!id){showStatus('Event submitted for approval.')}else if(status==='approved'){await loadEvents();showStatus('Approved Event updated.')}else{showStatus('Pending Event updated.');await openQueue()}}catch(err){showStatus(err.message,true)}}
@@ -495,8 +546,8 @@ function canEditStaffMember(m){
 async function loadStaff(){
  if(!(member?.is_owner||member?.can_manage_staff))return;
  const d=await api('/api/admin/members');staffMembers=d.members||[];
- $('staffCount').textContent=`${staffMembers.length} staff`;
- $('staffList').innerHTML=staffMembers.map(m=>{const badge=m.is_owner?' <span class="tag">OWNER</span>':m.can_manage_staff?' <span class="tag">STAFF MANAGER</span>':'';const edit=canEditStaffMember(m)?`<button data-edit-staff="${m.id}">Edit</button>`:'';return `<div class="queueItem"><div class="queueTop"><div><strong>${esc(m.display_name)}</strong>${badge}<div class="queueMeta"><span>${esc(m.department)}</span><span>Discord: ${esc(m.discord_id)}</span><span>${m.is_active?'Active':'Inactive'}</span></div></div><span class="queueStatus">${m.is_active?'ACTIVE':'INACTIVE'}</span></div><div class="queueMeta"><span>Events: ${[m.can_submit_events&&'Submit',m.can_approve_events&&'Approve',m.can_edit_events&&'Edit',m.can_disable_events&&'Disable'].filter(Boolean).join(' / ')||'None'}</span><span>Parties: ${[m.can_submit_parties&&'Submit',m.can_approve_parties&&'Approve',m.can_edit_parties&&'Edit',m.can_disable_parties&&'Disable'].filter(Boolean).join(' / ')||'None'}</span><span>Locations: ${[m.can_submit_locations&&'Submit',m.can_approve_locations&&'Approve',m.can_edit_locations&&'Edit',m.can_disable_locations&&'Disable'].filter(Boolean).join(' / ')||'None'}</span>${m.can_manage_staff?'<span>Staff: Manage</span>':''}</div><div class="queueActions">${edit}</div></div>`}).join('')||'<div class="queueEmpty">No staff members.</div>';
+ $('staffCount').textContent=`${staffMembers.length} staff`;const activeStaff=staffMembers.filter(m=>m.is_active).length;$('staffActivity').textContent=`${activeStaff} active · ${staffMembers.length-activeStaff} inactive`;
+ $('staffList').innerHTML=staffMembers.map(m=>{const badge=m.is_owner?' <span class="tag">OWNER</span>':m.can_manage_staff?' <span class="tag">STAFF MANAGER</span>':'';const edit=canEditStaffMember(m)?`<button data-edit-staff="${m.id}">Edit</button>`:'';return `<div class="queueItem"><div class="queueTop"><div><strong>${esc(m.display_name)}</strong>${badge}<div class="queueMeta"><span>${esc(m.department)}</span><span>Discord: ${esc(m.discord_id)}</span><span>${m.is_active?'Active':'Inactive'}</span></div></div><span class="queueStatus ${m.is_active?'staffActiveBadge':'staffInactiveBadge'}">${m.is_active?'ACTIVE':'INACTIVE'}</span></div><div class="queueMeta"><span>Events: ${[m.can_submit_events&&'Submit',m.can_approve_events&&'Approve',m.can_edit_events&&'Edit',m.can_disable_events&&'Disable'].filter(Boolean).join(' / ')||'None'}</span><span>Parties: ${[m.can_submit_parties&&'Submit',m.can_approve_parties&&'Approve',m.can_edit_parties&&'Edit',m.can_disable_parties&&'Disable'].filter(Boolean).join(' / ')||'None'}</span><span>Locations: ${[m.can_submit_locations&&'Submit',m.can_approve_locations&&'Approve',m.can_edit_locations&&'Edit',m.can_disable_locations&&'Disable'].filter(Boolean).join(' / ')||'None'}</span>${m.can_manage_staff?'<span>Staff: Manage</span>':''}</div><div class="queueActions">${edit}</div></div>`}).join('')||'<div class="queueEmpty">No staff members.</div>';
  document.querySelectorAll('[data-edit-staff]').forEach(b=>b.onclick=()=>{const m=staffMembers.find(x=>String(x.id)===String(b.dataset.editStaff));if(m&&canEditStaffMember(m))openStaffForm(m)});
 }
 async function openStaff(){try{await loadStaff();openOverlay('staffOverlay')}catch(e){showStatus(e.message,true)}}
@@ -515,44 +566,54 @@ function openStaffForm(m=null){
  openOverlay('staffFormOverlay');
 }
 async function openQueue(){
- const sections=[];
+ const sections=[],counts=[];
  try{
   if(member?.can_approve_events){
-   const d=await api('/api/admin/events/pending');
+   const d=await api('/api/admin/events/pending');counts.push({label:'Events',count:(d.events||[]).length});
    const items=(d.events||[]).map(e=>`<div class="queueItem"><div class="queueTop"><div><strong>${esc(e.name)}</strong><div class="queueMeta"><span>${esc(e.category)}</span><span>Submitted by ${esc(e.submitted_by_name||'Unknown')}</span>${e.location?`<span>📍 ${esc(e.location)}</span>`:''}</div></div><span class="queueStatus">PENDING</span></div><div class="queuePreview">${esc(e.announcement)}</div><div class="queueActions"><button data-qedit-event="${e.id}">Edit</button><button class="primary" data-qapprove-event="${e.id}">Approve</button><button class="danger" data-qreject-event="${e.id}">Reject</button></div></div>`).join('');
    sections.push(`<section class="queueSection"><div class="queueSectionHead"><h3>Events</h3><span class="queueCount">${d.count} pending</span></div>${items||'<div class="queueEmpty">No pending Events.</div>'}</section>`);
   }
   if(member?.can_approve_parties){
-   const d=await api('/api/admin/parties/pending');
+   const d=await api('/api/admin/parties/pending');counts.push({label:'Parties',count:(d.templates||[]).length});
    const items=(d.templates||[]).map(p=>`<div class="queueItem"><div class="queueTop"><div><strong>${esc(p.name)}</strong><div class="queueMeta"><span>${esc(p.category)}</span><span>Submitted by ${esc(p.submitted_by_name||'Unknown')}</span></div></div><span class="queueStatus">PENDING</span></div><div class="queuePreview">${esc(renderTemplate(p.template,p.default_name,p.default_detail,p.default_extra))}</div><div class="queueActions"><button data-qedit-party="${p.id}">Edit</button><button class="primary" data-qapprove-party="${p.id}">Approve</button><button class="danger" data-qreject-party="${p.id}">Reject</button></div></div>`).join('');
    sections.push(`<section class="queueSection"><div class="queueSectionHead"><h3>Parties</h3><span class="queueCount">${d.count} pending</span></div>${items||'<div class="queueEmpty">No pending Party templates.</div>'}</section>`);
   }
   if(member?.can_approve_locations){
-   const d=await api('/api/admin/locations/pending');
+   const d=await api('/api/admin/locations/pending');counts.push({label:'Locations',count:(d.locations||[]).length});
    const items=(d.locations||[]).map(l=>`<div class="queueItem"><div class="queueTop"><div><strong>${esc(l.name)}</strong><div class="queueMeta"><span>Submitted by ${esc(l.submitted_by_name||'Unknown')}</span><span>📍 ${esc(l.coordinates)}</span></div></div><span class="queueStatus">PENDING</span></div>${l.images?.[0]?`<img class="queueLocationImage" src="${esc(locationImageSrc(l.images[0]))}" alt="${esc(l.name)}">`:''}${l.description?`<div class="queuePreview">${esc(l.description)}</div>`:''}<div class="queueActions"><button data-qedit-location="${l.id}">Edit</button><button class="primary" data-qapprove-location="${l.id}">Approve</button><button class="danger" data-qreject-location="${l.id}">Reject</button></div></div>`).join('');
    sections.push(`<section class="queueSection"><div class="queueSectionHead"><h3>Locations</h3><span class="queueCount">${d.count} pending</span></div>${items||'<div class="queueEmpty">No pending Locations.</div>'}</section>`);
   }
  }catch(e){showStatus(e.message,true);return}
- $('queueContent').innerHTML=sections.join('')||'<div class="queueEmpty">Nothing pending.</div>';
+ $('queueContent').innerHTML='<div class="queueOverview" aria-label="Pending submissions"><div><span class="queueBigCount">'+counts.reduce((n,x)=>n+x.count,0)+'</span><span class="queueOverviewLabel">Pending submissions</span></div><div class="queueOverviewTypes">'+counts.map(x=>'<span>'+esc(x.label)+' <b>'+x.count+'</b></span>').join('')+'</div></div>'+(sections.join('')||'<div class="queueEmpty">Nothing pending.</div>');
  openOverlay('queueOverlay');
 
- document.querySelectorAll('[data-qapprove-event]').forEach(b=>b.onclick=()=>moderate('events',b.dataset.qapproveEvent,'approve'));
- document.querySelectorAll('[data-qreject-event]').forEach(b=>b.onclick=()=>moderate('events',b.dataset.qrejectEvent,'reject'));
- document.querySelectorAll('[data-qapprove-party]').forEach(b=>b.onclick=()=>moderate('parties',b.dataset.qapproveParty,'approve'));
- document.querySelectorAll('[data-qreject-party]').forEach(b=>b.onclick=()=>moderate('parties',b.dataset.qrejectParty,'reject'));
- document.querySelectorAll('[data-qapprove-location]').forEach(b=>b.onclick=()=>moderate('locations',b.dataset.qapproveLocation,'approve'));
- document.querySelectorAll('[data-qreject-location]').forEach(b=>b.onclick=()=>moderate('locations',b.dataset.qrejectLocation,'reject'));
+ document.querySelectorAll('[data-qapprove-event]').forEach(b=>b.onclick=()=>moderate('events',b.dataset.qapproveEvent,'approve',b.closest('.queueItem')?.querySelector('strong')?.textContent||'this submission'));
+ document.querySelectorAll('[data-qreject-event]').forEach(b=>b.onclick=()=>moderate('events',b.dataset.qrejectEvent,'reject',b.closest('.queueItem')?.querySelector('strong')?.textContent||'this submission'));
+ document.querySelectorAll('[data-qapprove-party]').forEach(b=>b.onclick=()=>moderate('parties',b.dataset.qapproveParty,'approve',b.closest('.queueItem')?.querySelector('strong')?.textContent||'this submission'));
+ document.querySelectorAll('[data-qreject-party]').forEach(b=>b.onclick=()=>moderate('parties',b.dataset.qrejectParty,'reject',b.closest('.queueItem')?.querySelector('strong')?.textContent||'this submission'));
+ document.querySelectorAll('[data-qapprove-location]').forEach(b=>b.onclick=()=>moderate('locations',b.dataset.qapproveLocation,'approve',b.closest('.queueItem')?.querySelector('strong')?.textContent||'this submission'));
+ document.querySelectorAll('[data-qreject-location]').forEach(b=>b.onclick=()=>moderate('locations',b.dataset.qrejectLocation,'reject',b.closest('.queueItem')?.querySelector('strong')?.textContent||'this submission'));
 
  document.querySelectorAll('[data-qedit-event]').forEach(b=>b.onclick=async()=>{const d=await api('/api/admin/events/pending');const x=d.events.find(e=>String(e.id)===b.dataset.qeditEvent);if(x){closeOverlays();openEventForm({...x,status:'pending'})}});
  document.querySelectorAll('[data-qedit-party]').forEach(b=>b.onclick=async()=>{const d=await api('/api/admin/parties/pending');const x=d.templates.find(p=>String(p.id)===b.dataset.qeditParty);if(x){closeOverlays();openPartyForm({...x,status:'pending'})}});
  document.querySelectorAll('[data-qedit-location]').forEach(b=>b.onclick=async()=>{const d=await api('/api/admin/locations/pending');const x=d.locations.find(l=>String(l.id)===b.dataset.qeditLocation);if(x){closeOverlays();openLocationForm({...x,status:'pending'})}});
 }
-async function moderate(type,id,action){let body;if(action==='reject'){const reason=prompt('Optional rejection reason:','');if(reason===null)return;body=JSON.stringify({reason})}try{await api(`/api/admin/${type}/${id}/${action}`,{method:'PATCH',body});showStatus(action==='approve'?'Approved.':'Rejected.');await Promise.all([loadEvents(),loadParties(),loadLocations()]);await openQueue()}catch(e){showStatus(e.message,true)}}
+async function moderate(type,id,action,name='this submission'){
+ const verb=action==='approve'?'Approve':'Reject';
+ const choice=await requestConfirmation({title:`${verb} ${({'events':'event','parties':'party template','locations':'location'})[type]}?`,description:`${verb} “${name}”? This will update the shared approval queue.`,verb:verb+' submission',danger:action==='reject',reason:action==='reject'});
+ if(!choice)return;
+ const body=action==='reject'?JSON.stringify({reason:choice.reason}):undefined;
+ try{
+  await api(`/api/admin/${type}/${id}/${action}`,{method:'PATCH',body});
+  showStatus(action==='approve'?'Submission approved.':'Submission rejected.');
+  await Promise.all([loadEvents(),loadParties(),loadLocations()]);await openQueue();
+ }catch(e){showStatus(e.message,true)}
+}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('eventsView').classList.toggle('hidden',b.dataset.tab!=='events');$('partiesView').classList.toggle('hidden',b.dataset.tab!=='parties')});
 $('loginBtn').onclick=()=>location.href=API+'/api/auth/discord';
 $('logoutBtn').onclick=async()=>{try{await api('/api/auth/logout',{method:'POST'});member=null;renderAuth();renderEvents();renderParties();showStatus('Logged out.')}catch(e){showStatus(e.message,true)}};
 $('staffBtn').onclick=openStaff;$('addStaffBtn').onclick=()=>openStaffForm();$('queueBtn').onclick=openQueue;$('addBtn').onclick=()=>openEventForm();$('partySubmitBtn').onclick=()=>openPartyForm();$('suggestLocationBtn').onclick=()=>openLocationForm();
-$('q').oninput=renderEvents;$('partyQ').oninput=renderParties;$('locQ').oninput=renderLocations;$('evF3').oninput=updateEventCount;$('locImages').onchange=handleLocationImagesChanged;$('viewerPrevBtn').onclick=()=>viewerStep(-1);$('viewerNextBtn').onclick=()=>viewerStep(1);$('viewerZoomOutBtn').onclick=()=>viewerZoomBy(-0.25);$('viewerZoomInBtn').onclick=()=>viewerZoomBy(0.25);$('viewerZoomResetBtn').onclick=()=>{viewerZoom=1;renderImageViewer()};$('cropZoomOut').onclick=()=>cropper?.zoom(-.1);$('cropZoomIn').onclick=()=>cropper?.zoom(.1);$('cropRotateLeft').onclick=()=>cropper?.rotate(-90);$('cropRotateRight').onclick=()=>cropper?.rotate(90);$('cropReset').onclick=()=>cropper?.reset();document.querySelectorAll('#cropAspect [data-ratio]').forEach(b=>b.onclick=()=>{document.querySelectorAll('#cropAspect [data-ratio]').forEach(x=>x.classList.remove('active'));b.classList.add('active');cropper?.setAspectRatio(b.dataset.ratio==='free'?NaN:Number(b.dataset.ratio))});
+$('q').oninput=renderEvents;$('partyQ').oninput=renderParties;$('clearPartyFilters').onclick=()=>{$('partyQ').value='';partyActive='All';buildPartyFilters();renderParties();$('partyQ').focus()};$('locQ').oninput=renderLocations;$('evF3').oninput=updateEventCount;$('locImages').onchange=handleLocationImagesChanged;$('viewerPrevBtn').onclick=()=>viewerStep(-1);$('viewerNextBtn').onclick=()=>viewerStep(1);$('viewerZoomOutBtn').onclick=()=>viewerZoomBy(-0.25);$('viewerZoomInBtn').onclick=()=>viewerZoomBy(0.25);$('viewerZoomResetBtn').onclick=()=>{viewerZoom=1;renderImageViewer()};$('cropZoomOut').onclick=()=>cropper?.zoom(-.1);$('cropZoomIn').onclick=()=>cropper?.zoom(.1);$('cropRotateLeft').onclick=()=>cropper?.rotate(-90);$('cropRotateRight').onclick=()=>cropper?.rotate(90);$('cropReset').onclick=()=>cropper?.reset();document.querySelectorAll('#cropAspect [data-ratio]').forEach(b=>b.onclick=()=>{document.querySelectorAll('#cropAspect [data-ratio]').forEach(x=>x.classList.remove('active'));b.classList.add('active');cropper?.setAspectRatio(b.dataset.ratio==='free'?NaN:Number(b.dataset.ratio))});
 ['ptTemplate','ptDefaultName','ptDefaultDetail','ptDefaultExtra'].forEach(id=>$(id).oninput=updatePartyFormPreview);
 $('randomBtn').onclick=()=>{let pool=events.filter(e=>(active==='All'||e.category===active)&&(!favOnly||favs.has(e.name)));const fresh=pool.filter(e=>!recent.includes(e.name));if(fresh.length)pool=fresh;if(!pool.length){showStatus('No events match the current category or favorites filter.',true);return}const p=pool[Math.floor(Math.random()*pool.length)];randomEventId=p.id;$('q').value=p.name;renderEvents();setTimeout(()=>document.querySelector('#grid .card.isRandom')?.scrollIntoView({behavior:'smooth',block:'center'}),50)};
 $('favBtn').onclick=()=>{favOnly=!favOnly;$('favBtn').textContent=favOnly?'★ Showing Favorites':'★ Favorites';renderEvents()};
@@ -563,11 +624,12 @@ $('detailsCopyCoords').onclick=()=>{const e=events.find(x=>String(x.id)===String
 $('hostDoneBtn').onclick=()=>{const e=events.find(x=>String(x.id)===String(detailsEventId));if(e)markRecent(e.name);closeOverlay('eventDetailsOverlay')};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=e=>closeOverlay(e.currentTarget));document.querySelectorAll('.overlay').forEach(x=>x.onclick=e=>{if(e.target===x)closeOverlay(x)});
 document.addEventListener('keydown',e=>{
- if(e.key==='Escape'){closeTopOverlay();return}
- const openLayers=[...document.querySelectorAll('.overlay.show')].sort((a,b)=>(Number(a.style.zIndex)||20)-(Number(b.style.zIndex)||20));
- if(e.key==='Tab'&&openLayers.at(-1)?.id==='eventDetailsOverlay'){
-  const buttons=[...$('eventDetailsOverlay').querySelectorAll('button:not(:disabled)')].filter(b=>b.getClientRects().length&&!b.closest('.hidden'));
-  if(buttons.length){const first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
+ if(e.key==='Escape'){if(openedOverlays().length){e.preventDefault();closeTopOverlay()}return}
+ const top=openedOverlays().at(-1);
+ if(e.key==='Tab'&&top){
+  const controls=focusables(top),first=controls[0],last=controls.at(-1);
+  if(controls.length){if(e.shiftKey&&(document.activeElement===first||!top.contains(document.activeElement))){e.preventDefault();last.focus()}else if(!e.shiftKey&&(document.activeElement===last||!top.contains(document.activeElement))){e.preventDefault();first.focus()}}
+  else{e.preventDefault();top.querySelector('.modal')?.focus()}
  }
  const typing=e.target.closest?.('input,textarea,select,[contenteditable="true"]');
  if(e.key==='/'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!document.querySelector('.overlay.show')){
