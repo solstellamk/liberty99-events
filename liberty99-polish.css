@@ -1,0 +1,102 @@
+/* Liberty99 Entertainment Hub — progressive polish v0.1.
+   APP ONLY: cinematic l99i-* intro and backend logic remain untouched. */
+:root{--polish-outline:rgba(255,138,194,.17);--polish-shadow:0 18px 55px rgba(0,0,0,.28);--polish-ease:cubic-bezier(.2,.8,.2,1)}
+body{background:radial-gradient(ellipse 75% 38% at 50% 0%,rgba(91,30,67,.16),transparent 75%),var(--bg)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--pink2);outline-offset:3px}
+header{position:relative;padding:18px 0 15px;border-bottom:1px solid rgba(255,138,194,.09);background:linear-gradient(180deg,rgba(42,17,31,.26),rgba(11,10,13,0))}
+header .wrap{position:relative}
+header .logo{width:46px;height:46px;border-radius:13px;border:1px solid rgba(255,212,233,.27);box-shadow:0 8px 26px #ff4fa323,inset 0 1px 1px #ffffff4a;letter-spacing:-.06em}
+header h1{font-size:18px;letter-spacing:-.045em}
+header .sub{font-size:11px;color:#bdafbc}
+header .auth{flex-wrap:wrap;justify-content:flex-end}
+header .userPill{font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main.wrap{padding-top:14px}
+.tabs{gap:5px;margin:0 0 15px;padding:5px;width:fit-content;max-width:100%;overflow-x:auto;border:1px solid #2a202d;background:#110e13;border-radius:13px}
+.tab{border:1px solid transparent;background:transparent;color:#b9acba;padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;white-space:nowrap}
+.tab.active{color:#fff8fc;background:linear-gradient(180deg,#3f2235,#301725);border-color:#6a3855;box-shadow:0 3px 12px #0006, inset 0 1px #ffffff0c}
+.tab:not(.active):hover{background:#251823}
+.hubMast{position:relative;display:flex;justify-content:space-between;align-items:center;gap:18px;isolation:isolate;overflow:hidden;min-height:106px;margin:0 0 14px;padding:18px 25px;border:1px solid #583048;border-radius:18px;background:linear-gradient(92deg,rgba(25,12,22,.98) 0%,rgba(31,13,25,.91) 52%,rgba(55,17,41,.59) 100%),url('./assets/liberty99-night-city.webp') 75% 43% / cover no-repeat;box-shadow:var(--polish-shadow),0 0 40px #f03f8d09}
+.hubMast:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 89% 15%,#ff4fa320,transparent 45%);pointer-events:none}
+.hubMast:after{content:"";position:absolute;top:0;left:24px;width:96px;height:2px;background:linear-gradient(90deg,var(--pink),transparent);box-shadow:0 0 20px #ff4fa380}
+.mastEyebrow{margin:0 0 7px;color:var(--pink2);font-weight:700;font-size:10px;letter-spacing:.19em;text-transform:uppercase}
+.hubMast h2{margin:0;font-weight:800;color:#fff5fa;font-size:clamp(18px,2vw,24px);letter-spacing:-.04em}
+.mastDesc{margin:5px 0 0;font-size:11px;color:#d3baca}
+.mastMark{flex:none;font-weight:800;font-size:clamp(36px,5vw,56px);letter-spacing:-.1em;color:rgba(255,175,215,.17);padding-right:8px;text-shadow:0 0 30px #ff4fa323;user-select:none}
+.toolbar{grid-template-columns:minmax(250px,1fr) repeat(4,auto);gap:8px;margin:0 0 12px;align-items:stretch}
+.searchWrap{position:relative;min-width:0}
+.searchWrap input{height:100%;min-height:43px;padding-left:39px;padding-right:45px;background:#141016;border-color:#433043}
+.searchGlyph{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:17px;color:#ab92a4;pointer-events:none}
+.shortcutHint{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:1px solid #423342;border-radius:5px;padding:1px 6px;color:#9c8998;font-size:11px;pointer-events:none}
+.toolbar button{white-space:nowrap;font-size:12px;font-weight:600}
+.filters{margin:0 0 0;padding-bottom:10px;gap:6px}
+.filters button{border-color:#372738;background:#161017;color:#b6a4b3}
+.filters button.active{color:#ffe9f4;background:#382034;border-color:#9d5375}
+.meta,.partyMeta{display:flex;align-items:center;gap:4px;font-size:11px;color:#a996a8;margin:2px 0 13px}
+.recent{background:linear-gradient(95deg,#17111a,#1d131c);border-color:#3f2b3e;padding:10px 12px;border-radius:12px;margin-bottom:13px;line-height:1.7}
+.recent b{display:inline-block;color:#e9c7d8;letter-spacing:.02em;margin-right:8px}
+.recent .chip{background:#2b1a2a;border-color:#50324a;color:#efcddf;padding:6px 10px;margin:2px 4px 2px 0}
+.grid{gap:12px;grid-template-columns:repeat(3,minmax(0,1fr));padding-bottom:24px}
+.card{position:relative;display:flex;flex-direction:column;gap:0;overflow:hidden;border:1px solid #3b2b3d;border-radius:16px;background:linear-gradient(155deg,#1b151e 0%,#130f16 88%);padding:15px;box-shadow:inset 0 1px 0 #ffffff07,0 8px 25px #0001}
+.card:before{content:"";height:2px;position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#ff4fa35e,transparent 65%);opacity:.5;transition:opacity .2s}
+.card:hover{border-color:#81506e;box-shadow:0 13px 32px #0005,0 0 24px #ff4fa30c}
+.card:hover:before{opacity:1}
+.card .head{gap:10px;align-items:center;min-height:52px}
+.card .ico{width:41px;height:41px;display:grid;place-items:center;flex:none;font-size:21px;background:#30202e;border:1px solid #55334e;border-radius:12px}
+.card .title strong{font-size:14px;line-height:1.3;color:#fff9fd}
+.card .tags{margin-top:6px}
+.card .tag{border-color:#483344;background:#251a25;color:#c9b4c5;font-size:10px;padding:3px 7px;line-height:1.25}
+.card .fav{align-self:start;font-size:17px;width:32px;height:32px;border:1px solid transparent;background:transparent;border-radius:9px}
+.card .fav:hover{color:#ffd66b;background:#322431}
+.card .announcement{flex:1;min-height:78px;margin:14px 0 12px;padding:11px 12px;color:#e8d9e4;font-size:12px;line-height:1.6;word-wrap:break-word;background:rgba(7,5,8,.5);border:1px solid #332733;border-radius:10px}
+.card .announcement:before{content:"F3 ANNOUNCEMENT";display:block;font-size:9px;line-height:1.3;letter-spacing:.12em;font-weight:700;color:#9b7c90;margin-bottom:7px}
+.card .actions{align-items:stretch;gap:6px}
+.card .actions button{border-radius:9px;font-size:11px;font-weight:650;padding:9px 10px;min-height:36px}
+.card .actions .copyF3{flex:1 1 110px;background:#ff4fa3;color:#200510;border:1px solid #ff4fa3;font-weight:800}
+.card .actions .hostEvent{flex:1 1 95px;border-color:#70405d;background:#311d2e;color:#ffe8f2}
+.card .actions .copyName{flex:0 0 auto;color:#b4a3b2;border-color:#3e3040}
+.card .actions .staffAction{background:transparent;color:#bc9fb0}
+.card .actions .danger{color:#ff9baf}
+.card .count{align-self:center;margin-left:auto;white-space:nowrap;color:#9d8798}
+#grid .card.isRandom{border-color:var(--pink);box-shadow:0 0 0 1px #ff4fa340,0 0 45px #ff4fa321}
+#grid .card.isRandom:before{opacity:1;background:linear-gradient(90deg,var(--pink),var(--pink2),transparent)}
+.empty{border:1px dashed #513749;border-radius:16px;background:#171019;padding:33px 18px;text-align:center;color:#c6aebe;margin-bottom:20px}
+.empty .emptyTitle{color:#fff4fa;font-size:15px;font-weight:750;margin-bottom:6px}
+.empty button{margin-top:14px}
+.polishSkeleton{pointer-events:none}
+.polishSkeleton .sLine,.polishSkeleton .sBlock{background:linear-gradient(90deg,#251a27,#392639,#251a27);background-size:200% 100%;animation:polishShimmer 1.3s ease-in-out infinite alternate;border-radius:8px}
+.polishSkeleton .sLine{height:13px;width:52%;margin:6px 0 12px}.polishSkeleton .sLine.short{width:32%;height:9px}.polishSkeleton .sBlock{height:86px;width:100%;margin-top:20px}
+@keyframes polishShimmer{to{background-position:100% 0}}
+.status{border-color:#61405a;background:#261621;box-shadow:0 10px 25px #0002}
+.partiesHero{background:linear-gradient(110deg,#231220,#2b1525 66%,#211321);border-color:#583148;box-shadow:0 10px 30px #0002}
+.partyCard,.partyBuilder{box-shadow:inset 0 1px #ffffff07,0 8px 24px #0002}
+.partyCard{background:linear-gradient(150deg,#1d151d,#151016);border-color:#493046}
+.partyCard .announcement{color:#e8d4e0}
+.partyBuilder{border-color:#6a3a55}
+.partyBuilder .primary{min-height:41px}
+.loc,.queueItem,.detailBox{border-color:#453147}
+.queueItem{background:linear-gradient(140deg,#211722,#151019)}
+.queueActions .primary{min-width:95px}
+/* Event Host Mode is the existing event details overlay, enhanced rather than forked. */
+#eventDetailsOverlay .hostModal{width:min(820px,100%);border-color:#613b53;padding:20px;background:linear-gradient(145deg,#1e131e,#100d11 65%);box-shadow:0 30px 90px #000a,0 0 70px #ff4fa30a}
+.hostEyebrow{color:var(--pink2);font-size:10px;font-weight:800;letter-spacing:.14em;margin-bottom:5px}
+#eventDetailsOverlay .modalTop{align-items:start;margin-bottom:16px}
+#eventDetailsOverlay .modalTop h2{font-size:clamp(19px,2vw,25px);letter-spacing:-.045em}
+.hostHeroF3{border:1px solid #68405a!important;background:linear-gradient(135deg,#291728,#1c111d)!important;padding:16px!important}
+.hostHeroF3 .detailLabel{color:#e5a5c7;font-weight:750;letter-spacing:.1em}
+.hostHeroF3 .detailF3{font-size:15px;line-height:1.65;color:#fff0f7}
+.hostLocationMedia{display:flex;align-items:center;gap:13px;padding:9px;margin:10px 0 0;background:#18111a;border:1px solid #4a2c42;border-radius:12px}
+.hostLocationMedia img{width:138px;aspect-ratio:16/9;object-fit:cover;flex-shrink:0;display:block;border-radius:8px;border:1px solid #65425b}
+.hostLocationMedia .hostMediaText{font-size:12px;color:#c1adbb;min-width:0;flex:1}
+.hostLocationMedia .hostMediaText strong{display:block;color:#fbe6f1;font-size:13px;margin-bottom:3px}
+.hostLocationMedia button{font-size:11px;flex-shrink:0}
+#eventDetailsOverlay .detailsGrid{gap:9px}
+#eventDetailsOverlay .detailBox{background:rgba(18,13,19,.9);border-radius:12px}
+#eventDetailsOverlay .detailValue{line-height:1.55}
+#eventDetailsOverlay .modalActions{margin-top:17px;padding-top:12px;border-top:1px solid #493047}
+#eventDetailsOverlay .modalActions .primary{font-weight:800;min-height:43px}
+#eventDetailsOverlay #hostDoneBtn{margin-right:auto}
+.hostHint{color:#a38b9d;font-size:10px;padding:9px 3px 0}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:minmax(180px,1fr) repeat(2,auto)}.toolbar .searchWrap{grid-column:1/-1}}
+@media(max-width:700px){header .headerRow{align-items:flex-start;flex-direction:column;gap:11px}header .auth{justify-content:flex-start;width:100%}.hubMast{padding:15px 17px;min-height:95px}.mastMark{font-size:34px}.mastDesc{max-width:270px}.tabs{width:100%}.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(3,minmax(0,1fr))}.toolbar .searchWrap{grid-column:1/-1}.toolbar button{padding:10px 8px}.toolbar #addBtn{grid-column:1/-1}#eventDetailsOverlay .hostModal{padding:14px}#eventDetailsOverlay .modalActions{justify-content:stretch}#eventDetailsOverlay .modalActions button{flex:1 1 auto}#eventDetailsOverlay #detailsCopyF3{order:-1;flex-basis:100%}.hostLocationMedia{flex-wrap:wrap}.hostLocationMedia button{margin-left:auto}}
+@media(max-width:380px){.hubMast{padding:14px}.mastMark{display:none}header h1{font-size:16px}.card .actions .copyName{flex:1 1 90px}.hostLocationMedia img{width:110px}}
+@media(prefers-reduced-motion:reduce){.polishSkeleton .sLine,.polishSkeleton .sBlock{animation:none}}
