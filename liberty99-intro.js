@@ -45,7 +45,7 @@
           <div class="l99i-subtitle">ENTERTAINMENT HUB</div>
         </div>
         <div class="l99i-accent-rule"></div>
-        <div class="l99i-creator">Made by <strong>David</strong><span class="l99i-creator-dot" aria-hidden="true">·</span>Discord <b>@davidkekw0</b></div>
+        <div class="l99i-creator"><span class="l99i-credit-line">Made with <span class="l99i-credit-heart" aria-label="love" role="img">♥</span> by <strong>David</strong> for the Liberty99 Entertainment Team</span></div>
       </div>
       <div class="l99i-meta">EVENTS <b>·</b> PARTIES <b>·</b> LOCATIONS</div>
       <div class="l99i-controls">

@@ -105,8 +105,9 @@ body.l99i-site-revealing > main{animation-delay:70ms}
  background:rgba(20,17,22,.65);border:1px solid rgba(255,138,194,.16);border-radius:999px;
  box-shadow:0 10px 30px rgba(0,0,0,.18);opacity:0;transform:translateY(8px)}
 .l99i-creator strong{color:#fff7fb;font-weight:700}
-.l99i-creator b{color:#ff8ac2;font-weight:700}
-.l99i-creator .l99i-creator-dot{color:#8c667c;margin:0 2px}
+.l99i-credit-line{display:block;text-align:center}
+.l99i-credit-heart{color:#ff4fa3;font-size:12px;line-height:1;display:inline-block;margin:0 1px}
+.l99i-creator{max-width:min(550px,calc(100vw - 32px));text-wrap:balance}
 .l99i-playing .l99i-creator{animation:l99i-creator-in .75s 2.95s ease-out both}
 @keyframes l99i-creator-in{to{opacity:1;transform:translateY(0)}}
-@media(max-width:700px){.l99i-creator{margin-top:17px;font-size:9px;padding:6px 10px;gap:5px;max-width:calc(100vw - 28px)}}
+@media(max-width:700px){.l99i-creator{margin-top:17px;font-size:11px;line-height:1.5;padding:8px 12px;gap:5px;max-width:calc(100vw - 28px)}}

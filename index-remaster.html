@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
-<meta name="author" content="David — Discord @davidkekw0">
+<meta name="author" content="David — Liberty99 Entertainment Hub">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Liberty99 Entertainment Hub</title>
@@ -109,13 +109,8 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 .l99-dev-footer{margin-top:16px;border-top:1px solid var(--line);background:linear-gradient(180deg,#110c13 0%,var(--bg) 100%)}
 .l99-dev-footer-inner{min-height:76px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;padding:20px 12px;color:var(--muted);font-size:11px;letter-spacing:.01em}
 .l99-dev-footer-inner strong{color:var(--text);font-weight:700}
-.l99-dev-spark{color:var(--pink);font-size:13px;margin-right:2px}
-.l99-dev-separator{color:#786674}
-.l99-dev-discord{opacity:.78}
-.l99-dev-footer .l99-dev-handle{background:transparent;border:1px solid transparent;border-radius:7px;padding:4px 6px;color:var(--pink2);font:inherit;font-weight:700;letter-spacing:inherit;box-shadow:none;transform:none;min-height:28px}
-.l99-dev-footer .l99-dev-handle:hover{background:#2a1724;border-color:#6b3655;box-shadow:none;transform:none}
-.l99-dev-footer .l99-dev-handle:focus-visible{outline:2px solid var(--pink2);outline-offset:2px}
-.l99-dev-handle span{font-size:12px;opacity:.75;margin-left:3px}
+.l99-dev-heart{color:var(--pink);font-size:13px;line-height:1;display:inline-block;vertical-align:baseline;margin:0 2px}
+.l99-dev-footer-inner .l99-dev-credit{text-align:center;line-height:1.7;text-wrap:balance}
 @media(max-width:600px){.l99-dev-footer-inner{gap:6px;font-size:10px;min-height:66px;padding:16px 8px}}
 </style>
 <link rel="stylesheet" href="./liberty99-intro.css">
@@ -184,11 +179,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 <!-- Subtle permanent creator credit; outside all app views and modals. -->
 <footer class="l99-dev-footer" aria-label="Website creator credit">
   <div class="wrap l99-dev-footer-inner">
-    <span class="l99-dev-spark" aria-hidden="true">✦</span>
-    <span>Made by <strong>David</strong></span>
-    <span class="l99-dev-separator" aria-hidden="true">·</span>
-    <span class="l99-dev-discord">Discord</span>
-    <button type="button" class="l99-dev-handle" id="l99DevCopy" title="Copy Discord: @davidkekw0" aria-label="Copy Discord username @davidkekw0">@davidkekw0 <span aria-hidden="true">⧉</span></button>
+    <span class="l99-dev-credit">Made with <span class="l99-dev-heart" aria-label="love" role="img">♥</span> by <strong>David</strong> for the Liberty99 Entertainment Team</span>
   </div>
 </footer>
 
@@ -725,28 +716,5 @@ document.addEventListener('keydown',e=>{
 })();
 </script>
 
-<script>
-/* Standalone credit copy interaction; original hub logic remains untouched. */
-(function(){
-  const credit = document.getElementById('l99DevCopy');
-  if(!credit)return;
-  credit.addEventListener('click', async function(){
-    const original = this.innerHTML;
-    const value = '@davidkekw0';
-    let copied = false;
-    try { await navigator.clipboard.writeText(value); copied = true; }
-    catch (_) {
-      const helper = document.createElement('textarea');
-      helper.value = value; helper.style.cssText = 'position:fixed;left:-9999px;opacity:0';
-      document.body.appendChild(helper);helper.select();
-      try { copied = document.execCommand('copy'); } catch (_) {}
-      helper.remove();
-    }
-    if(!copied)return;
-    this.textContent = '✓ Copied';
-    clearTimeout(this._l99Reset);
-    this._l99Reset = setTimeout(()=>{this.innerHTML=original},1400);
-  });
-})();
-</script>
+
 </body></html>
