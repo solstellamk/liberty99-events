@@ -1,4 +1,4 @@
-/* Liberty99 Entertainment Hub — progressive polish v0.2.
+/* Liberty99 Entertainment Hub — progressive polish v0.3.
    APP ONLY: cinematic l99i-* intro and backend logic remain untouched. */
 :root{--polish-outline:rgba(255,138,194,.17);--polish-shadow:0 18px 55px rgba(0,0,0,.28);--polish-ease:cubic-bezier(.2,.8,.2,1)}
 body{background:radial-gradient(ellipse 75% 38% at 50% 0%,rgba(91,30,67,.16),transparent 75%),var(--bg)}
@@ -166,3 +166,13 @@ main.wrap{padding-top:14px}
 #staffList .queueActions{margin-top:2px}
 #staffList .queueMeta span{line-height:1.5}
 @media(max-width:600px){.staffActivity{width:100%;margin-left:0}}
+
+/* v0.3 — release hardening: distinguish truly disabled actions and keep all touch targets clear. */
+.formActions button:disabled,.confirmActions button:disabled{opacity:.58;cursor:wait;box-shadow:none}
+#retryLocations,#clearLocationSearch,#clearPartyFilters{min-height:40px}
+.locationSearchEmpty button{margin-top:10px}
+#grid .card .announcement,#eventDetailsOverlay .detailValue,.locationPreviewInfo .detailValue{overflow-wrap:anywhere}
+@media(max-width:600px){
+ #grid .card .actions .copyF3,#grid .card .actions .hostEvent{min-height:42px}
+ .viewerToolbar button,.locationPreviewActions button{min-height:40px}
+}
