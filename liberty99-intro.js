@@ -37,7 +37,7 @@
       <div class="l99i-noise" aria-hidden="true"></div>
       <canvas class="l99i-particles" aria-hidden="true"></canvas>
       <div class="l99i-intro-veil" aria-hidden="true"></div>
-      <div class="l99i-topnote">LIBERTY99 PRESENTS</div>
+      <div class="l99i-topnote">LIBERTY99</div>
       <div class="l99i-stage" aria-hidden="true">
         <div class="l99i-mark">L99</div>
         <div class="l99i-wordmark">
@@ -45,10 +45,9 @@
           <div class="l99i-subtitle">ENTERTAINMENT HUB</div>
         </div>
         <div class="l99i-accent-rule"></div>
-        <div class="l99i-tagline">YOUR CITY. YOUR STAGE.</div>
         <div class="l99i-creator">Made by <strong>David</strong><span class="l99i-creator-dot" aria-hidden="true">·</span>Discord <b>@davidkekw0</b></div>
       </div>
-      <div class="l99i-meta">EVENTS <b>·</b> PARTIES <b>·</b> COMMUNITY</div>
+      <div class="l99i-meta">EVENTS <b>·</b> PARTIES <b>·</b> LOCATIONS</div>
       <div class="l99i-controls">
         <button class="l99i-sound" type="button" aria-label="Enable cinematic sound" aria-pressed="false"><span class="l99i-sound-icon">♪</span><span class="l99i-sound-label">Sound off</span></button>
         <button class="l99i-skip" type="button">Skip intro <span aria-hidden="true">↗</span></button>

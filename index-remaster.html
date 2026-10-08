@@ -123,7 +123,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 </head>
 <body>
 <header><div class="wrap"><div class="headerRow">
-  <div class="brand"><div class="logo">L99</div><div><h1>Liberty99 Entertainment Hub</h1><div class="sub">Events & Parties — find it, customize it, copy it.</div></div></div>
+  <div class="brand"><div class="logo">L99</div><div><h1>Liberty99 Entertainment Hub</h1><div class="sub">Events · Parties · Locations</div></div></div>
   <div class="auth"><span id="userPill" class="userPill">Public</span><button id="loginBtn">Login with Discord</button><button id="logoutBtn" class="hidden">Logout</button>  <button type="button" id="l99iReplay" class="l99i-replay" title="Replay Liberty99 introduction" aria-label="Replay Liberty99 introduction"><span class="l99i-replay-icon" aria-hidden="true">↻</span><span class="l99i-replay-label">Watch Intro</span></button></div>
 </div></div></header>
 
@@ -133,7 +133,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 
   <section id="eventsView">
     <div class="hubMast" aria-label="Liberty99 Events">
-      <div><p class="mastEyebrow">LIBERTY99 · EVENTS OPERATIONS</p><h2>Your city. Your stage.</h2><p class="mastDesc">Find your next event. Copy the F3. Get hosting.</p></div>
+      <div><p class="mastEyebrow">EVENTS · F3 ANNOUNCEMENTS</p><h2>Event Library</h2></div>
       <span class="mastMark" aria-hidden="true">L99</span>
     </div>
     <div class="toolbar">
@@ -149,7 +149,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 
   <section id="partiesView" class="hidden">
     <div class="partiesHero">
-      <div><h2>🎉 Parties F3 Toolkit</h2><p>Pick a reusable announcement template, customize the gang / organization and details, then copy the finished F3.</p></div>
+      <div><h2>Party Announcements</h2></div>
       <div class="partiesHeroActions"><button id="partySubmitBtn" class="primary hidden">＋ Submit Template</button></div>
     </div>
     <div class="partyToolbar">
@@ -164,7 +164,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
         <div class="partyEmpty" id="partyEmpty"><strong id="partyEmptyTitle">No matching templates</strong><p id="partyEmptyDesc">Try another search or category.</p><button type="button" id="clearPartyFilters">Clear party filters</button></div>
       </div>
       <aside class="partyBuilder" id="partyBuilder">
-        <div class="builderTop"><div><h2 id="builderTitle">Select a template</h2><div class="note" id="builderCategory">Choose one from the library.</div></div><span class="tag">LIVE PREVIEW</span></div>
+        <div class="builderTop"><div><h2 id="builderTitle">Select a template</h2><div class="note" id="builderCategory">No template selected</div></div></div>
         <div class="builderFields">
           <div class="field"><label>Name / gang / organization</label><input id="partyName" maxlength="24" placeholder="e.g. VAGOS"></div>
           <div class="field"><label>Main detail</label><input id="partyDetail" maxlength="28" placeholder="e.g. CHOP SHOP"></div>
@@ -249,9 +249,9 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 </div></div>
 
 <div class="overlay" id="eventDetailsOverlay"><div class="modal hostModal" role="dialog" aria-modal="true" aria-labelledby="detailsTitle">
-  <div class="modalTop"><div><div class="hostEyebrow">● EVENT HOST CONSOLE</div><h2 id="detailsTitle">Host Event</h2><div class="note" id="detailsMeta"></div></div><button class="close" data-close aria-label="Close Host Mode">✕</button></div>
+  <div class="modalTop"><div><div class="hostEyebrow">EVENT DETAILS</div><h2 id="detailsTitle">Host Event</h2><div class="note" id="detailsMeta"></div></div><button class="close" data-close aria-label="Close Host Mode">✕</button></div>
   <div class="detailsGrid">
-    <div class="detailBox full hostHeroF3"><div class="detailLabel">Ready to copy · F3 Announcement</div><div class="detailValue detailF3" id="detailsF3"></div></div>
+    <div class="detailBox full hostHeroF3"><div class="detailLabel">F3 Announcement</div><div class="detailValue detailF3" id="detailsF3"></div></div>
     <div class="detailBox"><div class="detailLabel">Location</div><div class="detailValue" id="detailsLocation"></div></div>
     <div class="detailBox"><div class="detailLabel">Setup</div><div class="detailValue" id="detailsSetup"></div></div>
     <div class="detailBox full" id="detailsCoordsBox"><div class="detailLabel">Coordinates</div><div class="detailValue" id="detailsCoords"></div></div>
@@ -260,7 +260,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
   </div>
   <div id="hostLocationMedia" class="hostLocationMedia hidden"></div>
   <div class="modalActions"><button id="hostDoneBtn">✓ Done Hosting</button><button id="detailsCopyName">Copy Name</button><button id="detailsCopyCoords">Copy Coords</button><button id="detailsCopyF3" class="primary">⧉ Copy F3 Announcement</button></div>
-  <div class="hostHint">Done Hosting only closes this panel and saves a local recent shortcut. It does not log an event with staff.</div>
+  <div class="hostHint">This does not record a completed event.</div>
 </div></div>
 
 <div class="overlay" id="eventOverlay"><div class="modal">
@@ -305,7 +305,7 @@ input:focus,textarea:focus,select:focus{transform:translateY(-1px);box-shadow:0 
 </div></div>
 
 <div class="overlay" id="cropperOverlay"><div class="modal cropperModal">
-  <div class="modalTop"><div><h2>✦ Edit Screenshot</h2><div class="note" id="cropperFileName">Crop, zoom and reposition before uploading.</div></div><button class="close" type="button" id="cropCancelBtn">✕</button></div>
+  <div class="modalTop"><div><h2>Edit Screenshot</h2><div class="note" id="cropperFileName">Crop, zoom and reposition before uploading.</div></div><button class="close" type="button" id="cropCancelBtn">✕</button></div>
   <div class="cropperShell">
     <div class="cropStage"><img id="cropperImage" alt="Screenshot being edited"></div>
     <div class="cropToolbar">
@@ -457,12 +457,12 @@ function updatePartyBuilder(){
  $('partyMeter').setAttribute('aria-valuenow',String(Math.min(80,len)));
  $('partyMeter').classList.toggle('nearLimit',len>=71&&len<=80);
  $('partyMeter').classList.toggle('overLimit',len>80);
- $('partyLengthHint').textContent=!p?'Select a template to start.':len>80?`Too long — remove ${len-80} character${len-80===1?'':'s'} to copy.`:len>=71?`${80-len} characters remaining · ready to copy`:'Ready to copy · maximum 80 characters.';
+ $('partyLengthHint').textContent=!p?'Select a template to start.':len>80?`Too long — remove ${len-80} character${len-80===1?'':'s'} to copy.`:`${80-len} character${80-len===1?'':'s'} remaining`;
 }
 function renderParties(){
  const term=$('partyQ').value.trim().toLowerCase();const list=parties.filter(p=>(partyActive==='All'||p.category===partyActive)&&(!term||`${p.name} ${p.category} ${p.template} ${p.description||''}`.toLowerCase().includes(term)));
  $('partyTotal').textContent=parties.length;$('partyShown').textContent=list.length;$('partyEmpty').style.display=list.length?'none':'block';$('partyEmptyTitle').textContent=partiesLoadFailed?'Templates could not be loaded':parties.length?'No matching templates':'No templates available';$('partyEmptyDesc').textContent=partiesLoadFailed?'Check your connection or try again.':parties.length?'Try another name or category.':'The Party template library is empty.';$('clearPartyFilters').textContent=partiesLoadFailed?'Try loading again':'Clear party filters';
- if(!parties.length){selectedPartyId=null;$('builderTitle').textContent='Select a template';$('builderCategory').textContent='Choose one from the library.';$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';$('partyBuilderAdmin').classList.add('hidden')}else if(!selectedParty())selectedPartyId=parties[0].id;
+ if(!parties.length){selectedPartyId=null;$('builderTitle').textContent='Select a template';$('builderCategory').textContent='No template selected';$('partyName').value='';$('partyDetail').value='';$('partyExtra').value='';$('partyBuilderAdmin').classList.add('hidden')}else if(!selectedParty())selectedPartyId=parties[0].id;
  if(selectedParty() && !$('partyName').value && !$('partyDetail').value && !$('partyExtra').value){const p=selectedParty();$('builderTitle').textContent=`${p.icon||'🎉'} ${p.name}`;$('builderCategory').textContent=p.category||'';$('partyName').value=p.default_name||'';$('partyDetail').value=p.default_detail||'';$('partyExtra').value=p.default_extra||'';updatePartyBuilder()}
  $('partyGrid').innerHTML=list.map(p=>{const out=renderTemplate(p.template,p.default_name,p.default_detail,p.default_extra);return `<article class="partyCard ${String(p.id)===String(selectedPartyId)?'selected':''}"><div class="head"><span class="ico">${esc(p.icon||'🎉')}</span><div class="title"><strong>${esc(p.name)}</strong><div class="tags"><span class="tag">${esc(p.category)}</span><span class="templateBadge">TEMPLATE</span></div></div></div><div class="announcement">${esc(out)}</div><div class="actions"><button class="primary" data-puse="${esc(p.id)}" aria-pressed="${String(p.id)===String(selectedPartyId)}">${String(p.id)===String(selectedPartyId)?"✓ Selected":"Use Template"}</button><span class="count">${[...out].length}/80</span></div></article>`}).join('');
  document.querySelectorAll('[data-puse]').forEach(b=>b.onclick=()=>selectParty(b.dataset.puse,true));
@@ -550,8 +550,8 @@ function openEventDetails(id){
  $('detailsCoords').textContent=coords||'No coordinates available';
  $('detailsCoordsBox').classList.toggle('hidden',!coords);
  $('detailsCopyCoords').classList.toggle('hidden',!coords);
- $('detailsHow').textContent=e.how||'No instructions added yet.';
- $('detailsNotes').textContent=e.notes||'No notes added.';
+ $('detailsHow').textContent=e.how||'No instructions saved.';
+ $('detailsNotes').textContent=e.notes||'No notes saved.';
  const media=$('hostLocationMedia');media.replaceChildren();media.classList.add('hidden');
  if(loc?.images?.length){
   const thumbnail=document.createElement('img');thumbnail.src=locationImageSrc(loc.images[0]);thumbnail.alt=`${loc.name} location preview`;thumbnail.loading='lazy';
